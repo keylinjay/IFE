@@ -1,0 +1,13 @@
+/**
+ * 页面表单样式
+ */
+form label{
+	display: inline-block;
+	line-height: 1.7;
+	text-align: right;
+	width: 10em;
+}
+form button{
+	margin-left: 15em;
+	margin-top: 1em;
+}

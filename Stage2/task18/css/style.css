@@ -1,0 +1,14 @@
+#show-area{
+	
+}
+.showData{
+	border: 1px solid;
+	background: #f00;
+	color: #fff;
+	display: inline-block;
+	font-size: 20px;
+	line-height: 2em;
+	margin-left: 1em;
+	text-align: center;
+	width: 2em;
+}

@@ -1,0 +1,26 @@
+body{
+	height: 95vh;
+}
+fieldset{
+	text-align: center;
+}
+label{
+	border: 1px solid;
+	margin-left: 1em;
+}
+label input{
+	/*display: none;*/
+}
+label:active{
+	background: #aaa;
+}
+div.aqi-chart-wrap{
+	/*background: #ccc;*/
+	border: 1px solid #000;
+	height: 80%;
+	margin: 1em auto;
+	width: 90%;
+}
+.por{position: relative;}.poa{position: absolute;}
+.w100p{width: 100%;}.h100p{height: 100%;}
+.bd1s{border: 1px solid;}

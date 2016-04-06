@@ -1,0 +1,51 @@
+/**
+ * 通用样式库
+ */
+
+.bgcccc{background: #ccc;}.bgcfc0{background: #fc0;}
+.w400{width: 400px;}.w50{width: 50px;}.h200{height: 200px;}.h50{height: 50px;}
+.por{position: relative;}.poa{position: absolute;}
+
+/**
+ * 网站通用样式
+ */
+
+
+
+/**
+ * 公共主体结构样式
+ */
+#parent{
+	border: 1px solid;
+	height: 500px;
+	width: 1000px;
+	text-align: center;
+	
+}
+#parent:before{
+	content:" ";
+	height: 100%;
+	width: 1px;
+	display: inline-block;
+	vertical-align: middle;
+	/*border: 1px solid;*/
+}
+#child{
+	display: inline-block;
+	vertical-align: middle;
+	/*margin: 0 auto;*/
+}
+#sub2{
+	bottom: 0;right: 0;
+}
+
+
+/**
+ * 网页精细样式
+ */
+#sub1{
+	border-radius: 0 0 100% 0;
+}
+#sub2{
+	border-radius: 100% 0 0 0;
+}

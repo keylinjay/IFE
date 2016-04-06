@@ -1,0 +1,77 @@
+/**
+ * css reset
+ */
+div{
+	margin: 0;
+}
+/**
+ * 通用css代码
+ * @type {[type]}
+ */
+.bgceee{background: #eee;}.bgcfff{background: #fff;}
+.w200{width: 200px;}.w120{width: 120px;}.p2e{padding: 2em;}
+.p1e{padding: 1em;}.tac{text-align: center;}.bd1s{border: 1px solid #999;}
+.fl{float: left;}.fr{.float: right;}.clb{clear: both;}
+.poa{position: absolute;}
+/**
+ * 精细样式
+ */
+img{
+	width: 80px;
+}
+div>img,p{
+	display: inline-block;
+	vertical-align: top;
+	margin: 0.5em;
+}
+
+/*下面我们只关心布局部分*/
+/**
+ * 这是从左到右依次加载的布局css
+ */
+
+/*.col1{
+	position: absolute;
+}
+
+.col2{
+	float: left;
+	margin-left: 200px;
+	margin-right: 120px;
+}
+.col3{
+	float: left;
+	margin-left: -122px;
+}
+.container:after{
+	content:"";
+	display: block;
+	clear: both;
+}*/
+
+
+/**
+ * 下面是先加载中间主体部分的布局css
+ */
+
+/*方案一*/
+
+.col1{
+	float: left;
+	margin-left: 210px;
+	margin-right: 130px;
+}
+.col2{
+	float: left;
+	margin-left: -100%;
+}
+.col3{
+	float: left;
+	margin-left: -122px;
+}
+.container{
+	display: inline-block;
+
+}
+
+/*方案二*/
