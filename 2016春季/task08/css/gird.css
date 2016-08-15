@@ -1,0 +1,102 @@
+/*reset style*/
+ul{
+	list-style: none;
+}
+h1,h2,h3,h4,h5,h6,ul,ol,dl,dt{
+	padding: 0;
+	margin: 0;
+}
+
+/*general styel*/
+body{
+	background: #aca;
+	font:caption;
+}
+
+/*link style*/
+a:link,a:visited{
+	text-decoration: none;
+	color: #fff;
+}
+a:hover,a:active{
+	color: #ff0;
+	text-decoration: underline;
+}
+
+/*helper style*/
+
+
+/*constructure style*/
+.exp{
+	min-height: 1em;
+	outline: 1px solid;
+}
+
+
+/*moudles style*/
+/*clearfix style*/
+.clearfix{
+	*zoom:1;
+}
+.clearfix::after{
+	content:".";
+	display: inline-block;
+	visibility: hidden;
+	font-size: 0;
+	clear: both;
+}
+
+/*nav style*/
+nav{
+	position: relative;
+}
+nav li{
+	display: inline-block;
+}
+nav li a{
+	display: block;
+	text-align: center;
+	line-height: 2em;
+	width: 14em;
+}
+nav li:last-child{
+	margin-right: -2em;
+}
+
+
+/*gird style*/
+/*col-md style*/
+.row,.row *{
+	box-sizing: border-box;
+}
+.row::after{
+	content:".";
+	display: inline-block;
+	height: 0;
+	visibility: hidden;
+	clear: both;
+}
+[class*="col-"]{
+	/*display: inline-block;*/
+	float: left;
+	margin-left: -1px;
+	padding: 0 1em;
+	height: 1em;
+}
+.col-md-1{width: 12.25%;}
+.col-md-2{width: 25%;}
+.col-md-3{width: 37.25%;}
+.col-md-4{width: 50%;}
+.col-md-5{width: 62.25%;}
+.col-md-6{width: 75%;}
+@media screen and(max-width: 768px) {
+	[class*="col-"]{
+		width: 100%;
+	}
+	.col-sm-1{width: 12.25%;}
+	.col-sm-2{width: 25%;}
+	.col-sm-3{width: 37.25%;}
+	.col-sm-4{width: 50%;}
+	.col-sm-5{width: 62.25%;}
+	.col-sm-6{width: 75%;}
+}

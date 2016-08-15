@@ -144,15 +144,15 @@ function getInputValue () {
 	return str;
 }
 function btnHandle (fnc) {
-	return function (e) {
-		var value = getInputValue();
-		 fnc.apply(data,value);
-		 
-		 renderForm();
-	}
-
+	var value = getInputValue();
+	// 更新data的数据
+	fnc.apply(data,value);
+	renderForm();
 }
-$('#left-in')[0].onclick = btnHandle([].unshift);
+$('#left-in')[0].onclick = function(){btnHandle([].unshift);}
+$('#left-out')[0].onclick = function(){btnHandle([].shift);}
+$('#right-in')[0].onclick = function(){btnHandle([].push);}
+$('#right-out')[0].onclick = function(){btnHandle([].pop);}
 
 $('#btn-find')[0].onclick = function () {
 	 renderForm($('#find')[0].value); 
