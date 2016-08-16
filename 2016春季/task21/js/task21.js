@@ -9,14 +9,11 @@
 			if(!selector){
 				return this;
 			}
-			this.push(this.find(selector) );
-			this.name = selector;
+			this.find(selector);
 			return this;
 		},
 		push:function(){
-			console.log(arguments);
-
-			if(Array.push){
+			if(Array.prototype.push){
 				Array.prototype.push.apply(this,arguments);
 			}else{
 			    	
@@ -42,11 +39,10 @@
 			}
 		},
 		html:function(html){
-			this.foreach(function(){
-				this.innerHTML = html;
+			this.foreach(function(v,i,a){
+				v.innerHTML = html;
 			});
 		},
-		
 		addClass:function(name){
 			var reg = new RegExp("\\s*"+name+"\\s*","g");
 			this.foreach(function(node){
@@ -67,15 +63,22 @@
 		isObject:function(){},
 		find:function(selector){
 			var id = /^#([\w_-]+)/,
-				cln = /^\.([\w_-]+)/;
+				cln = /^\.([\w_-]+)/,
+				node,i,len;
 			if(id.test(selector)){
 				this.push(document.getElementById(selector.substring(1) ) );
 			}else if(cln.test(selector)){
-				this.push(document.getElementsByClassName(selector.substring(1) ) );
+				node = document.getElementsByClassName(selector.substring(1) );
+				for(i = 0,len = node.length;i < len;i++){
+					this.push(node[i]);
+				}
 			}else{
-				return document.getElementsByTagName(selector) ;
+				node = document.getElementsByTagName(selector);
+				for(i = 0,len = node.length;i < len;i++){
+					this.push(node[i]);
+				}
 			}
-			// return this;
+			return this;
 		},
 	}
 	$.extend = function(){};
@@ -83,11 +86,3 @@
 	$.fn.init.prototype = $.fn;
 	window.$ = $;
 }(undefined,window));
-function showppt(o){
-	console.log(arguments);
-	for(var p in o){
-		if(o.hasOwnProperty(p)){
-			console.log(p+':'+o[p]+'\n');
-		}
-	}
-}
