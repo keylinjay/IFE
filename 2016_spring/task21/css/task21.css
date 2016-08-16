@@ -11,3 +11,16 @@ input[type='text']:focus{
 textarea{
 	display: block;
 }
+.show span {
+	display: inline-block;
+	font-size: 1em;
+	margin-left: 2em;
+	border: 1px solid;
+}
+.show span:hover::before{
+	content: "删除";
+	margin-left: -2em;
+	color: #fff;
+	font-weight: bold;
+	background: #900;
+}
