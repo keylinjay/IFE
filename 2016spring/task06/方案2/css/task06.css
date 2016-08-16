@@ -1,0 +1,348 @@
+/*通用代码库*/
+html{
+	background: #666;
+}
+body{
+	width: 980px;
+	height: 1386px;
+	margin: 0 auto;
+	background: #fff;
+}
+h1,h2,h3,h4,h5,h6,p{
+	margin: 0;padding: 0;
+}
+.clearfix::after{
+	content: "";
+	display: block;
+	clear: both;
+}
+.fl{float: left;}.fr{float: right;}
+/*1.1页面的头部*/
+
+header{
+	position: relative;
+	width: 892px;
+	height: 61px;
+	margin: 0 auto;
+	border-bottom: 2px solid #938e8c;
+}
+.logo{
+	display: inline-block;
+	width: 106px;
+	line-height: 12px;
+	padding: 45px 0 4px 4px;
+	background: #d45d5c;
+}
+.logo-disc{
+	font: 12px "黑体";
+	text-decoration: none;
+	color: #fff;
+}
+.date{
+	position: absolute;
+	right: 0;
+	bottom: 4px;
+	font: 12px "黑体";
+	color: #d45d5c;
+}
+
+/*1.2主体部分*/
+
+main{
+	width: 892px;
+	margin: 0 auto;
+}
+
+/*1.2.1第一部分*/
+.part1{
+	margin: 35px 0 30px 0;
+}
+.part1-img{
+	display: inline-block;
+	width: 641px;
+	height: 301px;
+	background: url(../img/picture1.png) center;
+	-webkit-background-size: 641px 301px;
+	background-size: 641px 301px;
+}
+.filter{
+	width: 191px;
+	height: 301px;
+	opacity: 0.3;
+	background: #000;
+}
+.part1-header{
+	float: right;
+	width: 203px;
+	height: 301px;
+	border-top: 2px solid #cc8091;
+}
+.part1-header-main{
+	padding-top: 5px;
+	font: small-caps 24px "微软雅黑";
+	text-decoration: underline;
+}
+.part1-header-main span{
+	text-transform: uppercase;
+}
+.part1-header-sub{
+	font: italic 12px/10px "楷体";
+	color: #676767;
+}
+.part1-header-keywords{
+	padding-top: 14px;
+}
+.part1-header-keywords-1{
+	font: oblique 116px "微软雅黑";
+	color: #75b86b;
+	margin-left: -15px;
+}
+.part1-header-keywords-2{
+	font: 55px/55px "微软雅黑";
+	color: #cc8091;
+}
+.part1-header-keywords-disc{
+	display: inline-block;
+	width: 112px;
+	word-wrap: break-word;
+	font: 12px "微软雅黑";
+	color: #cc8091;
+}
+.part1-header-keywords-disc-head{
+	font: 21px/12px "微软雅黑";
+	color: #cc8091;
+}
+.part1-content{
+	width: 641px;
+	height: 200px;
+	margin: 30px 0 0 0;
+	font: 12px/16px "宋体";
+	color: #767777;
+}
+.part1-content-col-1{
+	float: left;
+	width: 230px;
+}
+.part1-content-col-1 h3{
+	font: bold 16px "微软雅黑";
+	text-decoration: underline;
+	color: #418c59;
+	margin-bottom: 8px;
+}
+.part1-content-col-2{
+	float: left;
+	width: 207px;
+	margin-left: 25px;
+}
+.part1-content-col-2 h3{
+	font: bold 16px "微软雅黑";
+	text-decoration: underline;
+	color: #d2994f;
+	margin-bottom: 8px;
+}
+.part1-content-col-3{
+	float: left;
+	width: 140px;
+	line-height: 20px;
+	margin-left: 25px;
+}
+.part1-content-col-3 h3{
+	font: bold 16px "微软雅黑";
+	text-decoration: underline;
+	color: #cc7680;
+	margin-bottom: 8px;
+}
+.part1-content-col-3 span{
+	font: 12px/16px "微软雅黑";
+	color: #231815;
+	opacity: 0.7;
+}
+.part1-content-col-3 i{
+	font: italic 12px/16px "微软雅黑";
+	color: #cd4a48;
+	opacity: 0.7;
+}
+
+/*第二部分*/
+
+.part2{
+	border-bottom: 1px solid #938e8c;
+}
+.part2-col-1{
+	width: 415px;
+	float: left;
+}
+.part2-col-1-header{
+	border-bottom: 2px solid;
+	font: bold 42px/20px "黑体";
+	text-transform: uppercase;
+	color: #11456b;
+}
+.part2-col-1-header i{
+	font: bold oblique 72px "黑体";
+	color: #f5e327;
+}
+.part2-col-1-header span{
+	display: inline-block;
+	font: bold 33px/62px "黑体";
+}
+.part2-col-1-content{
+	margin-top: 18px;
+	margin-bottom: 25px;
+	font: 12px/16px "宋体";
+}
+.part2-col-1-content p:not(:first-child){
+	text-indent: 2em;
+}
+.part2-col-1-content-bigWord{
+	float: left;
+	margin-right: 5px;
+	font: 70px "微软雅黑";
+	color: #f5e327;
+}
+.part2-col-1-content-img{
+	display: block;
+	float: right;
+	background: url(../img/picture1.png) center;
+	-webkit-background-size: 166px 286px;
+	background-size: 166px 286px;
+	width: 165px;
+	height: 286px;
+	margin: 15px 5px 0px 15px;
+}
+
+.part2-col-2{
+	float: right;
+}
+.part2-col-2-img{
+	position: relative;
+	width: 458px;
+	height: 275px;
+	background: url(../img/picture1.png) center;
+	-webkit-background-size: 458px 275px;
+	background-size: 458px 275px;
+}
+.part2-col-2-img-disc{
+	position: absolute;
+	bottom: 0;
+	background: #000;
+	opacity: 0.7;
+	width: 458px;
+	height: 61px;
+	font: 26px/61px "微软雅黑";
+	color: #fff;
+}
+.part2-col-2-img-disc span{
+	height: 44px;
+	margin-left: 35px;
+	padding-left: 10px;
+	border-left: 3px solid #72b16a;
+}
+.part2-col-2-img-disc span i{
+	font-size: 12px;
+	color: #72b16a;
+	/*letter-spacing: 1.4em;*/
+	margin-left: 1.4em;
+}
+.part2-col-2-abstract{
+	position: relative;
+	background: #eeedd6;
+	width: 458px;
+	height: 318px;
+	margin-top: 30px;
+}
+.part2-col-2-abstract-list{
+	position: relative;
+	padding-top: 20px;
+	margin: 0px auto;
+	width: 410px;
+	font: 16px/20px "宋体";
+	color: #5a5b5b;
+}
+.part2-col-2-abstract-list:before{
+	content: "";
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 10px 5px;
+	border-color: transparent transparent #000 transparent;
+}
+.part2-col-2-abstract-list i{
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	height: 18px;
+	font: oblique 12px/20px "宋体";
+}
+.part2-col-2-abstract-keyWord{
+	position: absolute;
+	bottom: 0;
+	width: 240px;
+	height: 140px;
+	padding: 10px;
+	background: #d45d5c;
+}
+.part2-col-2-abstract-keyWord-1{
+	float: left;
+	height: 160px;
+	line-height: 160px;
+	font: 110px "微软雅黑";
+	color: #fff;
+}
+.part2-col-2-abstract-keyWord-disc{
+	margin-top: 30px;
+	margin-left: 68px;
+	height: 86px;
+	padding-left: 8px;
+	border-left: 2px solid #fff;
+	color: #fff;
+}
+.part2-col-2-abstract-keyWord-disc h1{
+	font: oblique 21px/24px "黑体";
+	text-transform: uppercase;
+}
+.part2-col-2-abstract-keyWord-disc p{
+	font: 12px/16px "黑体";
+}
+.part2-col-2-abstract-quote{
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	width: 168px;
+	height: 140px;
+	padding: 15px 15px 0 15px;
+	text-indent: 3em;
+	font: oblique 14px/16px "黑体";
+	color: #5a5b5b;
+}
+.part2-col-2-abstract-quote::before{
+	content: '“';
+	position: absolute;
+	left: -65px;
+	top: 0;
+	font: 72px "黑体";
+	color: #d45d5c;
+}
+.part2-col-2-abstract-quote::after{
+	content: '”';
+	position: absolute;
+	right: -20px;
+	margin-top: -5px;
+	font: 72px "黑体";
+	color: #d45d5c;
+}
+
+
+/*页脚*/
+
+footer{
+	margin: 0 auto;
+	width: 892px;
+	text-align: right;
+}
+footer a{
+	text-decoration: none;
+	font: 12px "黑体";
+	color: #d4545c;
+}
