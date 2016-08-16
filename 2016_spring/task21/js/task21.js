@@ -101,9 +101,9 @@
 (function(undefined,window){
 	var data = [];
 	function add(v){
-		data.push(v.split(/[\s\n\,\，\t\、]+/));
-		if(data.length > 11){
-			data.splice(-10,10);
+		data.push(v.replace(/[\s\n\,\，]+/,""));
+		if(data.length > 10){
+			data = data.splice(-10,10);
 		}
 	}
 	function remove(v){
@@ -119,7 +119,6 @@
 		$(id).html(s);
 	}
 	function deleteTag(node){
-		// node.style.display = 'none';
 		remove(node.innerText);
 		render("#tag");
 	}
@@ -132,8 +131,8 @@
 	$("#input-tag")[0].onkeydown = function(){
 		var event = arguments[0] || window.event,
 			keychar = event.keyCode || event.which;
-			console.log(/\s/.test(keychar) );
-		if(/[\s\n\,\，]$/.test(this.value) ){
+			console.log(keychar);
+		if(/[\s\n\,\，]$/.test(this.value) || keychar === 13 ){
 			init();
 		}
 	};
@@ -141,4 +140,8 @@
 }(undefined,window));
 
 
+// 阻止表单自动提交
+$("#form21")[0].onkeydown = function(e){
+	return (e.keyCode || e.which)===13?false:true;
+}
 
