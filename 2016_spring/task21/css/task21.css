@@ -1,0 +1,13 @@
+label{
+	font:caption;
+	font-size: 2em;
+}
+input[type='text']{
+	font-size: inherit;
+}
+input[type='text']:focus{
+	box-shadow: outset 1px 1px 3px #009;
+}
+textarea{
+	display: block;
+}
