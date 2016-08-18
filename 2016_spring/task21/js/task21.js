@@ -85,7 +85,7 @@
 					var event = arguments[0] || window.event,
 						target = event.target;
 					if(target.tagName.toLowerCase() === targetName){
-						fn(target);
+						fn(event,target);
 					}
 				},false);
 			});
@@ -99,18 +99,36 @@
 }(undefined,window));
 // 业务代码
 (function(undefined,window){
-	var data = [];
-	function add(v){
-		data.push(v.replace(/[\s\n\,\，]+/,""));
+	var dataTag = [],
+		dataHobby = [],
+		ntag = '#tag',
+		ninputTag = '#input-tag',
+		nhobbies = '#hobby',
+		ninputHobbies = '#input-hobbies';
+	function add(data,v){
+		if(data === dataTag){
+			if(!v || /^[\s\,\，]$/.test(v) ){return data;}
+			console.log('replace');
+			data.push(v.replace(/[\s\n\,\，]+/g,""));	
+		}else{
+			var arr = [];
+			// console.log(v.split(/[\s\n\t\,\，]+/));
+			arr = v.split(/[\s\n\t\,\，]+/);
+			arr = arr.map(function(v){return v.replace(/^\s*\s*$/g,"");});
+			arr = arr.filter(function(v){return v != "";});
+			// data = [];
+			[].push.apply(data,arr);
+		}
 		if(data.length > 10){
-			data = data.splice(-10,10);
+			var len = data.length - 10;
+			data.splice(0,len);
 		}
 	}
-	function remove(v){
+	function remove(data,v){
 		var index = data.indexOf(v);
 		data.splice(index,1);
 	}
-	function render(id){
+	function render(data,id){
 		var s = "";
 		for(var i =0,len = data.length;i < len;i++){
 			s += "<span>"+data[i]+"</span>";
@@ -118,25 +136,49 @@
 		console.log(s);
 		$(id).html(s);
 	}
-	function deleteTag(node){
-		remove(node.innerText);
-		render("#tag");
+	function deleteTag(event,target){
+		console.log(target.parentNode.id)
+		if(target.parentNode.id === "tag"){
+			remove(dataTag,target.innerText);
+			render(dataTag,ntag);
+		}else{
+			remove(dataHobby,target.innerText);
+			render(dataHobby,nhobbies);
+		}
+	}
+	function addTag(event,target){
+		var keychar = event.keyCode || false;
+		if(keychar){
+			console.log("tag");
+			if(/[\s\,\，]/.test(target.value) || keychar ===13){
+				add(dataTag,target.value);
+				render(dataTag,ntag);
+				target.value = "";
+			}
+		}else{
+			// console.log($(ninputHobbies)[0].value);
+			add(dataHobby,$(ninputHobbies)[0].value);
+			console.log(dataHobby);
+			render(dataHobby,nhobbies);
+		}
 	}
 	function init(){
-		add($("#input-tag")[0].value);
-		render("#tag");
-		$("#input-tag")[0].value = '';
-	}
+		$(ninputTag).eventProx('input','keydown',addTag);
+		$(ntag).eventProx('span','click',deleteTag);
+		$("#cfm").eventProx('button','click',addTag);
+		$(nhobbies).eventProx('span','click',deleteTag);
 
-	$("#input-tag")[0].onkeydown = function(){
-		var event = arguments[0] || window.event,
-			keychar = event.keyCode || event.which;
-			console.log(keychar);
-		if(/[\s\n\,\，]$/.test(this.value) || keychar === 13 ){
-			init();
-		}
-	};
-	$("#tag").eventProx('span','click',deleteTag);
+	}
+	init();
+	// $("#input-tag")[0].onkeydown = function(){
+	// 	var event = arguments[0] || window.event,
+	// 		keychar = event.keyCode || event.which;
+	// 		console.log(keychar);
+	// 	if(/[\s\n\,\，]$/.test(this.value) || keychar === 13 ){
+	// 		init();
+	// 	}
+	// };
+	// $("#tag").eventProx('span','click',deleteTag);
 }(undefined,window));
 
 
