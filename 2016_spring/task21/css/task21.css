@@ -18,6 +18,7 @@ textarea{
 	padding: 0 0 0 2em;
 	min-width: 2em;
 	height: 2em;
+	line-height: 2em;
 	background: #009;
 	color: #ff0;
 	margin-left: .5em;
