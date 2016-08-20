@@ -92,7 +92,50 @@
 			return this;
 		},
 	}
-	$.extend = function(){};
+	$.extend = $.fn.extend = function(){
+		var deep = false,
+			target = arguments[0] || {},
+			len = arguments.length,
+			i = 1,
+			isArray = false,
+			options,name,src,copy,clone;
+		if(typeof arguments[0] === "boolean"){
+			deep = arguments[0];
+			target = arguments[1];
+			i = i+1;
+		}
+		if(i === len){
+			target = this;
+			i = i-1;
+		}
+		for(;i < len;i++){
+			if( (options = arguments[i]) != null){
+				for(name in options){
+					src = target[ name ];
+					copy = options [ name ];
+					if ( copy !== target ){
+						if ( deep && ( typeof copy === "object" || (isArray = ( typeof copy === "Array" )) ) ){
+							if(isArray){
+								isArray = false;
+								clone = src && ( typeof src === "Array" )? src : [];
+							}else{
+								clone = src && ( typeof src === "object" )? src : {};
+							}
+							target[ name ] = $.extend(deep,clone,copy);
+						}else if ( copy !== "undefined" ){
+							target[ name ] = copy;
+						}
+					}
+				}
+			}
+		}
+		return target;
+	};
+
+	$.fn.extend({
+		
+	});
+
 	$.domReady = function(){};
 	$.fn.init.prototype = $.fn;
 	window.$ = $;
@@ -147,7 +190,7 @@
 		}
 	}
 	function addTag(event,target){
-		var keychar = event.keyCode || false;
+		var keychar = event.keyCode || event.which || false;
 		if(keychar){
 			console.log("tag");
 			if(/[\s\,\，]/.test(target.value) || keychar ===13){
@@ -156,7 +199,6 @@
 				target.value = "";
 			}
 		}else{
-			// console.log($(ninputHobbies)[0].value);
 			add(dataHobby,$(ninputHobbies)[0].value);
 			console.log(dataHobby);
 			render(dataHobby,nhobbies);
@@ -170,15 +212,6 @@
 
 	}
 	init();
-	// $("#input-tag")[0].onkeydown = function(){
-	// 	var event = arguments[0] || window.event,
-	// 		keychar = event.keyCode || event.which;
-	// 		console.log(keychar);
-	// 	if(/[\s\n\,\，]$/.test(this.value) || keychar === 13 ){
-	// 		init();
-	// 	}
-	// };
-	// $("#tag").eventProx('span','click',deleteTag);
 }(undefined,window));
 
 
