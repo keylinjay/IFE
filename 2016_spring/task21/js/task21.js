@@ -134,76 +134,54 @@
 	_g.fn.init.prototype = _g.fn;
 	window._g = _g;
 }(undefined,window));
+
+// 通用的函数
+/**
+ * 继承
+ * @param  {object} obj 继承的原型
+ * @return {object}     继承后的对象
+ */
+function inherit(obj){
+	if(Object.create){
+		return Object.create(obj);
+	}
+	var F = function (){};
+	F.prototype = obj.prototype;
+	return new F();
+}
+/**
+ * 复制
+ * @return {扩展后的对象} 进行扩展
+ */
+function extend(){
+	return _g.extend;
+}
+/**
+ * 定义类
+ * @param  {function} constructor [description]构造函数 实例字段
+ * @param  {Object} menthod     [description]原型方法 实例方法
+ * @param  {obj} statics     [description]类字段 类方法
+ * @return {function}             [description]添加了上述字段和方法的构造函数
+ */
+function definedClass(constructor,menthod,statics){
+	if(menthod){
+		extend( constructor.prototype , menthod );
+	}
+	if( statics ){
+		extend( constructor , statics );
+	}
+	return constructor;
+}
+
+function definedSubClass(parentClass , constructor , menthod , statics ){
+	constructor.prototype = inherid(parent);
+	constructor.prototype.constructor = constructor;
+	return definedClass( constructor , menthod , statics );
+}
+
 // 业务代码
 (function(undefined,window){
-	var dataTag = [],
-		dataHobby = [],
-		ntag = '#tag',
-		ninputTag = '#input-tag',
-		nhobbies = '#hobby',
-		ninputHobbies = '#input-hobbies';
-	function add(data,v){
-		if(data === dataTag){
-			if(!v || /^[\s\,\，]_g/.test(v) ){return data;}
-			console.log('replace');
-			data.push(v.replace(/[\s\n\,\，]+/g,""));	
-		}else{
-			var arr = [];
-			arr = v.split(/[\s\n\t\,\，]+/);
-			arr = arr.map(function(v){return v.replace(/^\s*\s*_g/g,"");});
-			arr = arr.filter(function(v){return v != "";});
-			[].push.apply(data,arr);
-		}
-		if(data.length > 10){
-			var len = data.length - 10;
-			data.splice(0,len);
-		}
-	}
-	function remove(data,v){
-		var index = data.indexOf(v);
-		data.splice(index,1);
-	}
-	function render(data,id){
-		var s = "";
-		for(var i =0,len = data.length;i < len;i++){
-			s += "<span>"+data[i]+"</span>";
-		}
-		console.log(s);
-		_g(id).html(s);
-	}
-	function deleteTag(event,target){
-		console.log(target.parentNode.id)
-		if(target.parentNode.id === "tag"){
-			remove(dataTag,target.innerText);
-			render(dataTag,ntag);
-		}else{
-			remove(dataHobby,target.innerText);
-			render(dataHobby,nhobbies);
-		}
-	}
-	function addTag(event,target){
-		var keychar = event.keyCode || event.which || false;
-		if(keychar){
-			console.log("tag");
-			if(/[\s\,\，]/.test(target.value) || keychar ===13){
-				add(dataTag,target.value);
-				render(dataTag,ntag);
-				target.value = "";
-			}
-		}else{
-			add(dataHobby,_g(ninputHobbies)[0].value);
-			console.log(dataHobby);
-			render(dataHobby,nhobbies);
-		}
-	}
-	function init(){
-		_g(ninputTag).eventProx('input','keydown',addTag);
-		_g(ntag).eventProx('span','click',deleteTag);
-		_g("#cfm").eventProx('button','click',addTag);
-		_g(nhobbies).eventProx('span','click',deleteTag);
-
-	}
-	init();
+	
 }(undefined,window));
 
 
