@@ -174,14 +174,62 @@ function definedClass(constructor,menthod,statics){
 }
 
 function definedSubClass(parentClass , constructor , menthod , statics ){
-	constructor.prototype = inherid(parent);
+	constructor.prototype = inherit(parent);
 	constructor.prototype.constructor = constructor;
 	return definedClass( constructor , menthod , statics );
 }
 
+
 // 业务代码
 (function(undefined,window){
+	// 定义抽象方法
+	function abstractmethod(){throw 'abstract method'};
+
+	function AbstractAdd(id ,data){this.id = id; this.data = data || [];};
+
+	extend(AbstractAdd.prototype,{
+		add:abstractmethod,
+		delete:function(){
+			_g(this.id + ">.show").eventProx( "span" , "click" , function(event,target){
+				var value = target.innerText || target.textContent;
+				var index = this.data.indexOf(value);
+				this.data.splice( index , 1 );
+			} );
+		},
+		render:function(){
+			var s = "";
+			var len = this.data.length;
+			var i;
+			for(i = 0; i < len ; i++){
+				s += "<span>" + this.data[ i ] + "<span/>";
+			}
+			_g(this.id + ">.show" ).html( s );
+		}
+	});
+
+	function AddTag(id , data){
+		this.id = id;
+		this.data = data || [];
+	}
+
+
+	AddTag = definedSubClass(AbstractAdd , AddTag , {add:function(){
+		var data = this.data;
+		var input = _g( this.id + "<input" )[0];
+		var value = input.innerText || textContent;
+		input.onkeydown = function(e){
+			var event = e || window.event;
+			var keyChar = event.keyCode;
+			if( keyChar === 13 || /[\s\,\，]+/.test(keyChar) ){
+				data.push( value.replace(/[\s\,\，]+/g , "") );
+				console.log(data);
+				this.render();
+			}
+		};
+	}});
+
 	
+	new AddTag("#tags" , [] );
 }(undefined,window));
 
 
