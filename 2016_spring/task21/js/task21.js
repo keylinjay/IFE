@@ -72,7 +72,7 @@
 					src = target[ name ];
 					copy = options [ name ];
 					if ( copy !== target ){
-						if ( deep && ( typeof copy === "object" || (isArray = ( typeof copy === "Array" )) ) ){
+						if ( deep && ( typeof copy === "object" || (isArray = ( Array.isArray(copy) )) ) ){
 							if(isArray){
 								isArray = false;
 								clone = src && ( typeof src === "Array" )? src : [];
@@ -154,7 +154,7 @@ function inherit(obj){
  * @return {扩展后的对象} 进行扩展
  */
 function extend(){
-	return _g.extend;
+	return _g.extend.apply(undefined , arguments);
 }
 /**
  * 定义类
@@ -185,51 +185,132 @@ function definedSubClass(parentClass , constructor , menthod , statics ){
 	// 定义抽象方法
 	function abstractmethod(){throw 'abstract method'};
 
-	function AbstractAdd(id ,data){this.id = id; this.data = data || [];};
+	function Tag(name , data){
+		this.name = name || "";
 
-	extend(AbstractAdd.prototype,{
-		add:abstractmethod,
-		delete:function(){
-			_g(this.id + ">.show").eventProx( "span" , "click" , function(event,target){
-				var value = target.innerText || target.textContent;
-				var index = this.data.indexOf(value);
-				this.data.splice( index , 1 );
-			} );
-		},
-		render:function(){
-			var s = "";
-			var len = this.data.length;
-			var i;
-			for(i = 0; i < len ; i++){
-				s += "<span>" + this.data[ i ] + "<span/>";
-			}
-			_g(this.id + ">.show" ).html( s );
-		}
-	});
-
-	function AddTag(id , data){
-		this.id = id;
 		this.data = data || [];
+
+		this.id = "#" + this.name;
 	}
 
+	extend(Tag.prototype ,{
+			contain:function(v){
+				return this.data.indexOf(v) === -1 ? false : true ;
+			},
 
-	AddTag = definedSubClass(AbstractAdd , AddTag , {add:function(){
-		var data = this.data;
-		var input = _g( this.id + "<input" )[0];
-		var value = input.innerText || textContent;
+			add: function(){
+				var i;
+
+				for(i = 0;i < arguments.length ; i++){
+
+					// 去除重复的数据，并且允许数组直接添加,不允许空数据
+					if( Array.isArray( arguments[i] ) ){
+						this.add.apply( this , arguments[ i ] );
+					}else if( !this.contain( arguments[i] ) && arguments[i] !== "" ){
+						this.data.push( arguments[ i ] );
+					}
+				}
+
+				if(this.data.length > 10){
+					this.data = this.data.splice( -10 , 10 );
+				}
+
+				return this;
+			},
+			delete: function(v){
+				var data = this.data;
+				var p = data.indexOf( v );
+				data.splice( p , 1 );
+
+				return this;
+			},
+			toHtml: function(){
+				var s = "";
+				var len = this.data.length;
+				var i;
+				for(i = 0; i < len ; i++){
+					s += "<span>" + this.data[ i ] + "</span>";
+				}
+				return s;
+			},
+			render: function(){
+				_g( this.id + ">.show" )[0].innerHTML = this.toHtml();
+			},
+
+		});
+
+	var tag = new Tag( "tag" );
+
+	var hobby = new Tag( "hobby" );
+
+
+
+	function addTag(){
+
+		var input = _g( tag.id + " input" )[0];
+
 		input.onkeydown = function(e){
 			var event = e || window.event;
 			var keyChar = event.keyCode;
-			if( keyChar === 13 || /[\s\,\，]+/.test(keyChar) ){
-				data.push( value.replace(/[\s\,\，]+/g , "") );
-				console.log(data);
-				this.render();
+			var value = input.value;
+			if( keyChar === 13 || /[\s\,\，]$/.test( value ) ){
+				// trim处理
+				value.replace( /^[\s]*[\s]*$/g , "" );
+
+				tag.add( value.replace(/[\s\,\，]$/g , "") );
+				console.log(tag.data);
+				input.value = "";
+
+				tag.render();
 			}
 		};
-	}});
+	}
 
-	
-	new AddTag("#tags" , [] );
+	function addHobby(){
+		var text = _g( hobby.id + " textarea" )[0];
+		var btn = _g( hobby.id + " button" )[0];
+		btn.onclick = function(e){
+			var value = text.value;
+
+			var data = value.split( /[\s\t\n\r\,\，\.\。]+/ );
+
+			for(var i = 0 , len = data.length ; i < len ; i++ ){
+				// trim处理
+				data[i] = data[i].replace( /^[\s]*[\s]*$/g , "" );
+				// 如果有空数组则删除
+				if( data[i] === "" ){
+					data.splice( i , 1 );
+					len = data.length;
+					i--;
+				}
+			}
+
+			hobby.add( data );
+
+			hobby.render();
+
+			return false;
+
+		}
+	}
+
+	function removeTag(Tag){
+		_g(".show").eventProx("span" , "click" , function(e,t){
+			var value = t.innerText || t.Textcontent;
+			Tag.delete(value);
+			Tag.render();
+		});
+	}
+
+	function init(){
+		addTag();
+		removeTag(tag);
+
+		addHobby();
+		removeTag(hobby);
+	}
+
+	init();
 }(undefined,window));
 
 
