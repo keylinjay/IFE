@@ -1,0 +1,28 @@
+
+section{
+	width: 80%;
+	height: 500px;
+	margin: 0 auto;
+	text-align: center;
+	border: 1px solid;
+
+}
+section div{
+	float: left;
+	border: 1px solid;
+	background: #fff;
+	width: 40%;
+	height: 80%;
+	margin: 0 4%;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.select{
+	background: #00f;
+}
+
+.find{
+	background: #ff0;
+}
