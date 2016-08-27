@@ -1,5 +1,5 @@
 
-var root = document.getElementById('task21');
+var root = document.getElementById('task23').firstElementChild;
 
 var btn = document.getElementsByTagName('button');
 
@@ -14,30 +14,31 @@ var nlist = [];
 var timer = 300 ;
 
 var run = false ;
-
-function preOrder (node) {
+// 广度遍历
+function breadthOrder (node) {
 	if( node !== null ){
-		nlist.push( node ) ;
-		preOrder( node.firstElementChild ) ;
-		preOrder( node.lastElementChild ) ;
-	}
-}
-
-function middleOrder (node) {
-	if( node !== null ){
-		middleOrder( node.firstElementChild ) ;
-		nlist.push( node ) ;
-		middleOrder( node.lastElementChild ) ;
-	}
-}
-
-function postOrder (node) {
-	if( node !== null ){
-		postOrder( node.firstElementChild );
-		postOrder( node.lastElementChild );
+		var nextNode = node.nextElementSibling;
 		nlist.push( node );
+		while( nextNode !== null ){
+			nlist.push( nextNode );
+			nextNode = nextNode.nextElementSibling;
+		}
+		breadthOrder( node.firstElementChild );
 	}
 }
+// 深度遍历
+function deepOrder (node) {
+	if( node !== null ){
+		nlist.push( node );
+		breadthOrder( node.firstElementChild );
+		breadthOrder( node.nextElementSibling );
+		// 下面注释的方法也是可行的
+		// for( var i = 0 , len = node.children.length ; i < len ; i++ ){
+		// 	deepOrder( node.children[i] );
+		// }
+	}
+}
+
 
 function render () {
 	var i = 0 ;
@@ -57,19 +58,21 @@ function render () {
 		}
 		// 给当前元素添加类名
 		if( nlist[i] ){
+			// 重置类名
 			nlist[i].className = "select" ;
 
 			// 取得文本节点的文本并比较查询的值
 			if( nlist[i].firstChild.nodeType === 3){
 
 				var nodeText = nlist[i].firstChild.nodeValue.replace( /^\s+\s+$/g , "");
-				nodeText.replace( /[^\w\d]/g , "");
+				// 去掉回车符和空格
+				nodeText = nodeText.replace( /[\n\s]/g , "");
 
 				var searchValue = search.value.replace( /^\s+\s+$/g , "");
 
-				console.log(nodeText +":"+ searchValue);
 				// 如果等于查询的值则标记find类名
 				if(  nodeText === searchValue ){
+					// 添加find类名
 					nlist[i].className += " find";
 				}
 			}
@@ -83,18 +86,14 @@ function render () {
 prebtn.onclick = function(){
 	if( run ){ return false ;}
 	nlist = [] ;
-	preOrder( root ) ;
+	breadthOrder( root ) ;
+	console.log(nlist);
 	render() ;
 };
 middlebtn.onclick = function(){
 	if( run ){ return false ;}
 	nlist = [] ;
-	middleOrder( root ) ;
-	render() ;
-}
-postbtn.onclick = function(){
-	if( run ){ return false ;}
-	nlist = [] ;
-	postOrder( root ) ;
+	deepOrder( root ) ;
+	console.log(nlist);
 	render() ;
 }
