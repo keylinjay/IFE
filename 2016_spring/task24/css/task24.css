@@ -1,0 +1,34 @@
+
+section{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	height: 500px;
+	margin: 0 auto;
+	border: 1px solid;
+
+}
+section div{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: auto;
+	height: 80%;
+	margin: 1em;
+	border: 1px solid;
+}
+
+label{
+	display: inline-block;
+	text-align: right;
+	width: 5em;
+}
+
+.select{
+	background: #00f;
+}
+
+.find{
+	background: #ff0;
+}

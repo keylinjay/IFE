@@ -1,13 +1,16 @@
 
-var root = document.getElementById('task23').firstElementChild;
+var root = document.getElementById('task24').firstElementChild;
 
 var btn = document.getElementsByTagName('button');
 
-var prebtn = btn[0],
-	middlebtn = btn[1],
-	postbtn = btn[2];
+var breadthBtn = btn[0],
+	deepBtn = btn[1],
+	addBtn = btn[2],
+	deleteBtn = btn[3];
 
 var search = document.getElementById('search');
+
+var branchContent = document.getElementById('branchContent');
 
 var nlist = [];
 
@@ -16,6 +19,9 @@ var timer = 300 ;
 var run = false ;
 
 var breadthIndex = 0;
+
+var selected;
+
 // 广度遍历
 function breadthOrder (node) {
 	if( node !== null ){
@@ -81,19 +87,68 @@ function render () {
 		i++ ;
 	},timer);
 }
-
-
-prebtn.onclick = function(){
-	if( run ){ return false ;}
-	nlist = [] ;
-	breadthOrder( root ) ;
-	console.log(nlist);
-	render() ;
-};
-middlebtn.onclick = function(){
-	if( run ){ return false ;}
-	nlist = [] ;
-	deepOrder( root ) ;
-	console.log(nlist);
-	render() ;
+/**
+ * 事件代理
+ * @param  {node}   node          事件代理的node对象
+ * @param  {string}   eventType     事件名称
+ * @param  {string}   targetTagName 触发事件的node标签名
+ * @param  {Function} fn            事件代理函数
+ * @param  {Array}   args          事件代理函数的参数
+ * @return {null}                 没有返回值
+ */
+function eventProx ( node , eventType , targetTagName , fn , args ) {
+	node.addEventListener( eventType , function(){
+		var event = arguments[0] || window.event;
+		var target = event.target;
+		if( target.tagName.toLowerCase() === targetTagName ){
+			fn.apply( target , args );
+		}
+	} , false );
 }
+
+function select () {
+	if( selected ){
+
+		selected.className = selected.className.replace( /^\s*select/g , "" );
+	}
+	this.className += " select";
+	selected = this;
+}
+
+function addBranch () {
+	var branch = document.createElement( "div" );
+	branch.innerText = branchContent.value;
+	selected.appendChild( branch );
+}
+
+function deleteBranch () {
+	if( selected ){
+
+		selected.parentElement.removeChild( selected );
+	}
+}
+
+function init(){
+	breadthBtn.onclick = function(){
+		if( run ){ return false ;}
+		nlist = [] ;
+		breadthOrder( root ) ;
+		console.log(nlist);
+		render() ;
+	};
+	deepBtn.onclick = function(){
+		if( run ){ return false ;}
+		nlist = [] ;
+		deepOrder( root ) ;
+		console.log(nlist);
+		render() ;
+	};
+	
+	eventProx( root , "click" , "div" , select );
+	addBtn.onclick = addBranch;
+	deleteBtn.onclick = deleteBranch;
+}
+
+init();
+
+
