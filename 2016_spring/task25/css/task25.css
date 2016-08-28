@@ -1,0 +1,87 @@
+
+section{
+	height: 500px;
+	margin: 0 auto;
+	border: 1px solid;
+
+}
+
+
+label{
+	display: inline-block;
+	text-align: right;
+	width: 5em;
+}
+
+.node{
+
+	/*border: 1px solid;*/
+}
+
+.node>.node{
+	margin-left: 2em;
+}
+
+.node>h1{
+	font-size: 1em;
+	margin: 0;
+	padding-left: 2em;
+}
+
+.select{
+	background: #00f;
+}
+
+.light{
+	background: #ccc;
+}
+
+.closeBranch,.openBranch{
+	
+}
+
+.closeBranch>div{
+	display: none;
+}
+
+.row.closeBranch>h1::before,.row>h1::before{
+	content: "";
+	display: inline-block;
+	vertical-align: middle;
+	width: 0;
+	height: 0;
+
+	position: relative;
+	left: -1em;
+
+	border-style: solid;
+	cursor: pointer;
+}
+.row>h1::before{
+	border-width: .5em .2em 0 .2em;
+	border-color: #ff0 transparent transparent transparent;
+}
+.row.closeBranch>h1::before{
+	border-width: .2em 0 .2em .4em;
+	border-color: transparent transparent transparent #0f0;
+}
+
+
+
+
+/*辅助工具*/
+.add,.remove{
+	display: none;
+	margin-left: 1em;
+	cursor: pointer;
+
+}
+.add::before,.remove::before{
+	content: "+";
+}
+.remove{
+	transform: rotateZ(-45deg);
+}
+.node>h1:hover>.add,.node>h1:hover>.remove{
+	display: inline-block;
+}

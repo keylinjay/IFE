@@ -60,7 +60,7 @@ function render () {
 		}
 		// 去掉上一个添加的类名
 		if( nlist[i-1] ){
-			nlist[i-1].className = nlist[i-1].className.replace( /^\s*select/g , "" ) ;
+			nlist[i-1].className = nlist[i-1].className.replace( /\s*select/g , "" ) ;
 		}
 		// 给当前元素添加类名
 		if( nlist[i] ){
@@ -109,7 +109,7 @@ function eventProx ( node , eventType , targetTagName , fn , args ) {
 function select () {
 	if( selected ){
 
-		selected.className = selected.className.replace( /^\s*select/g , "" );
+		selected.className = selected.className.replace( /\s*select/g , "" );
 	}
 	this.className += " select";
 	selected = this;
