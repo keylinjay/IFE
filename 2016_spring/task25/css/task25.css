@@ -1,6 +1,6 @@
 
 section{
-	height: 500px;
+
 	margin: 0 auto;
 	border: 1px solid;
 
@@ -24,8 +24,8 @@ label{
 }
 
 .node>h1{
-	font-size: 1em;
-	margin: 0;
+	font-size: 1.5em;
+	margin: .5em;
 	padding-left: 2em;
 }
 
@@ -77,10 +77,11 @@ label{
 
 
 
-/*辅助工具*/
+/*添加、删除按钮*/
 .add,.remove{
 	display: none;
 	margin-left: 1em;
+	padding: 0 .5em;
 	cursor: pointer;
 
 }
@@ -94,5 +95,34 @@ label{
 	display: inline-block;
 }
 .root>h1:hover>.remove{
+	display: none;
+}
+
+/*面板*/
+.panel{
+	border: 1px solid;
+}
+
+.window{
+	content: "";
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0,0,0,0.7);
+}
+
+.window div{
+	position: fixed;
+	left: 2em;
+	right: 2em;
+	top: 20%;
+	height: 5em;
+	padding: 2em;
+	background: #fff;
+	z-index: 1;
+}
+.hidden{
 	display: none;
 }

@@ -1,7 +1,9 @@
+"use strict"
+var tree = document.getElementById('task25');
 
-var root = document.getElementById('task25').getElementsByClassName( 'root' )[0];
+var root = tree.getElementsByClassName( 'root' )[0];
 
-var btn = document.getElementsByTagName('button');
+var btn = tree.getElementsByTagName('button');
 
 var breadthBtn = btn[0],
 	deepBtn = btn[1],
@@ -11,6 +13,8 @@ var breadthBtn = btn[0],
 var search = document.getElementById('search');
 
 var branchContent = document.getElementById('branchContent');
+
+var addWindow = document.querySelectorAll( "#task25>.window" )[0];
 
 var nlist = [];
 
@@ -23,6 +27,8 @@ var run = false ;
 var breadthIndex = 0;
 
 var selected;
+
+var triggerNode = root;
 
 var defaultOrderFn = breadthOrder;
 
@@ -118,7 +124,7 @@ function render () {
 	result = [];
 
 	for( i = 0; i < len ; i++ ){
-		console.log( nlist );
+
 		removeClass( nlist[i] , "find" );
 
 		if( hasChildren( nlist[i] ) ){
@@ -218,6 +224,40 @@ function eventProx ( node , eventType , targetClassName , fn , args ) {
 	} , false );
 }
 
+function toHtml ( str ) {
+	var html = "<h1><span class='content'>" + str + "</span><span class='add'></span><span class='remove'></span></h1>";
+	var i =1;
+	var nodeStr;
+	while ( arguments[i] ){
+		nodeStr = arguments[i];
+		html += "<div class='node'>" + nodeStr + "</div>";
+		i++;
+	}
+	return html;
+}
+
+function addTree (str) {
+	if ( !root ) {
+		root = document.createElement( "div" );
+		root.className = "root node";
+		root.innerHTML = toHtml.apply( undefined , arguments );
+		tree.appendChild( root );
+		bindNlist();
+		render();
+		triggerNode = root;
+	}
+}
+
+function showWindow () {
+	triggerNode = thisNode( this );
+	removeClass( addWindow , "hidden" );
+}
+
+function hiddenWindow() {
+	addClass( addWindow , "hidden" );
+	branchContent.value = "";
+}
+
 function select () {
 	var node = thisNode( this );
 	// 点击时显示选择状态
@@ -240,17 +280,24 @@ function select () {
 function addBranch ( str ) {
 	console.log( str );
 	var value = str || branchContent.value;
-	
-	var node = thisNode( this );
+	// trim处理
+	value = value.replace( /^\s*\s*$/g , "" );
+	// 如果是空值就返回假值
+	if ( !value ){
+		return false;
+	}
+	// 如果不是空值
+	var node = triggerNode;
 	var branch = document.createElement( "div" );
-	var html ="<h1><span class='content'>" + value + "</span><span class='add'></span><span class='remove'></span></h1>"
 	branch.className = "node";
-	branch.innerHTML = html;
+	branch.innerHTML = toHtml( value );
 	node.appendChild( branch );
 
 	bindNlist();
 	render();
 	removeClass( node , "closeBranch" );
+
+	hiddenWindow();
 }
 
 function deleteBranch () {
@@ -265,6 +312,24 @@ function deleteBranch () {
 
 
 function init(){
+	if ( !root ){
+ 
+		addTree( "我的电脑" , 
+			toHtml( "c盘" ) , 
+			toHtml( "d盘" , 
+				toHtml( "软件" ) ,
+				toHtml( "照片" ) ,
+				toHtml( "隐藏文件夹" ,
+					toHtml( "小电影" ) ) ) ,
+			toHtml( "e盘" ,
+				toHtml( "小电影" ,
+					toHtml( "葫芦娃" ) ),
+				toHtml( "大电影" ),
+				toHtml( "电视剧" ),
+				toHtml( "迅雷下载" ) )
+			);
+	}
+
 	breadthBtn.onclick = function(){
 		if( run ){ return false ;}
 		nlist = [];
@@ -283,9 +348,13 @@ function init(){
 
 	};
 	
+	eventProx( addWindow , "click" , "confirm" , addBranch );
+
+	eventProx( addWindow , "click" , "cancel" , hiddenWindow );
+
 	eventProx( root , "click" , "content" , select );
 
-	eventProx( root , "click" , "add" , addBranch );
+	eventProx( root , "click" , "add" , showWindow );
 
 	eventProx( root , "click" , "remove" , deleteBranch );
 
@@ -295,24 +364,6 @@ function init(){
 }
 
 
-// selected = root;
-// addBranch( "header1" );
-
 init();
 
 
-
-
-
-
-function Tree( node , root ){
-	this.node = node;
-	this.root = this.parent.root || root;
-	this.selected = false;
-}
-Tree.prototype = {
-	constructor : Tree,
-	add : function ( str ) {},
-	remove : function () {},
-	select : function () {},
-}

@@ -7,20 +7,24 @@
 </head>
 <body>
 <section id="task25" >
-	<div class="root node">
-		<h1><span class="content">root</span><span class='add'></span><span class='remove'></span></h1>
+	<div class="panel search">
+		<label for="search">搜索：</label>
+		<input id="search" type="text">
+		<button id="1">广度遍历</button>
+		<button id="2">深度遍历</button>
 	</div>
+	<div class="window hidden">
+		<div class="panel">
+			<label for="branchContent">添加内容：</label>
+			<input type="text" id="branchContent">
+			<button class="confirm">确定</button>
+			<button class="cancel">取消</button>
+		</div>
+	</div>
+	<!-- <div class="root node">
+		<h1><span class="content">root</span><span class='add'></span><span class='remove'></span></h1>
+	</div> -->
 </section>
-<div>
-	<label for="search">搜索：</label>
-	<input id="search" type="text">
-	<button id="1">广度遍历</button>
-	<button id="2">深度遍历</button>
-</div>
-<div>
-	<label for="branchContent">添加内容：</label>
-	<input type="text" id="branchContent">
-</div>
 <script src="js/task25.js"></script>
 </body>
 </html>
