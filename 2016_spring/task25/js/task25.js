@@ -24,8 +24,10 @@ var breadthIndex = 0;
 
 var selected;
 
+var defaultOrderFn = breadthOrder;
+
 function hasClass ( node , str ) {
-	var reg = new RegExp( "\s*" + str + "\s*" );
+	var reg = new RegExp( "\\s*" + str + "\\s*" );
 	return reg.test( node.className );
 }
 
@@ -36,7 +38,7 @@ function addClass ( node , str ) {
 }
 
 function removeClass ( node , str ) {
-	var reg = new RegExp( "\s*" + str + "\s*" , "g" );
+	var reg = new RegExp( "\\s*" + str , "g" );
 	if( hasClass( node , str ) ){
 		node.className = node.className.replace( reg , "" );
 	}
@@ -54,7 +56,7 @@ function toggleClass ( node , str ){
 function breadthOrder (node) {
 
 	if( node !== null ){
-			console.log(node);
+			// console.log(node);
 		if( hasClass( node , "node" ) ){
 			nlist.push( node );
 		}
@@ -85,27 +87,49 @@ function deepOrder (node) {
 	}
 }
 
+function bindNlist () {
+	breadthIndex = 0;
+	nlist = [];
+	defaultOrderFn( root );
+}
+// 判断是否有子元素
 function hasChildren ( node ){
 	return hasClass( node.lastElementChild , "node" );
 }
 
+function thisNode ( node ){
+	// 优先返回root节点
+	if ( hasClass( node , "root" ) ){
+		return node;
+	}
+	// 返回还有node的节点
+	if ( hasClass( node , "node" ) ){
+		return node;
+	}
+
+	return thisNode( node.parentElement );
+}
+
 function render () {
+	
 	var i;
 	var len = nlist.length;
 	var node;
 	result = [];
-	for( i = 0; i < len ; i++ ){
 
+	for( i = 0; i < len ; i++ ){
+		console.log( nlist );
 		removeClass( nlist[i] , "find" );
 
 		if( hasChildren( nlist[i] ) ){
-			console.log( nlist[i] );
 			addClass( nlist[i] , "row" );
+		}else{
+			removeClass( nlist[i] , "row" );
 		}
 
-		if( nlist[i].getElementsByTagName( "h1" )[0] ){
+		if( nlist[i].getElementsByTagName( "h1" )[0].getElementsByClassName( "content" )[0] ){
 
-			var nodeText = nlist[i].getElementsByTagName( "h1" )[0].innerText.replace( /^\s+\s+$/g , "");
+			var nodeText = nlist[i].getElementsByTagName( "h1" )[0].getElementsByClassName( "content" )[0].innerText.replace( /^\s+\s+$/g , "");
 			// 去掉回车符和空格
 			nodeText = nodeText.replace( /[\n\s]/g , "");
 
@@ -141,6 +165,7 @@ function intervalRender () {
 		// 遍历完成后取消计时器
 		if( i === len ){
 			run = false ;
+			console.log( nlist );
 			render();
 			clearInterval( t ) ;
 		}
@@ -155,9 +180,9 @@ function intervalRender () {
 			removeClass( nlist[i] , "closeBranch" );
 			addClass( nlist[i] , "select" );
 			// 取得文本节点的文本并比较查询的值
-			if( nlist[i].getElementsByTagName( "h1" )[0] ){
+			if( nlist[i].getElementsByTagName( "h1" )[0].getElementsByClassName( "content" )[0] ){
 
-				var nodeText = nlist[i].getElementsByTagName( "h1" )[0].innerText.replace( /^\s+\s+$/g , "");
+				var nodeText = nlist[i].getElementsByTagName( "h1" )[0].getElementsByClassName( "content" )[0].innerText.replace( /^\s+\s+$/g , "");
 				// 去掉回车符和空格
 				nodeText = nodeText.replace( /[\n\s]/g , "");
 
@@ -183,18 +208,18 @@ function intervalRender () {
  * @param  {Array}   args          事件代理函数的参数
  * @return {null}                 没有返回值
  */
-function eventProx ( node , eventType , targetTagName , fn , args ) {
+function eventProx ( node , eventType , targetClassName , fn , args ) {
 	node.addEventListener( eventType , function(){
 		var event = arguments[0] || window.event;
 		var target = event.target;
-		if( target.tagName.toLowerCase() === targetTagName ){
+		if( hasClass( target , targetClassName ) ){
 			fn.apply( target , args );
 		}
 	} , false );
 }
 
 function select () {
-	var node = this.parentElement;
+	var node = thisNode( this );
 	// 点击时显示选择状态
 	if( selected !== node ){
 
@@ -207,24 +232,34 @@ function select () {
 		selected = node;
 	}
 	// 点击时切换打开与关闭
-	if( node.firstElementChild ){
+	if( hasChildren(node) ){
 		toggleClass( node , "closeBranch" );
 	}
 }
 
 function addBranch ( str ) {
+	console.log( str );
+	var value = str || branchContent.value;
+	
+	var node = thisNode( this );
 	var branch = document.createElement( "div" );
-	var html ="<h1>" + str + "<span class='add'></span><span class='remove'></span></h1>"
+	var html ="<h1><span class='content'>" + value + "</span><span class='add'></span><span class='remove'></span></h1>"
 	branch.className = "node";
 	branch.innerHTML = html;
-	selected.appendChild( branch );
+	node.appendChild( branch );
+
+	bindNlist();
+	render();
+	removeClass( node , "closeBranch" );
 }
 
 function deleteBranch () {
-	if( selected ){
-
-		selected.parentElement.removeChild( selected );
+	var node = thisNode( this );
+	if( node ){
+		node.parentElement.removeChild( node );
 	}
+	bindNlist();
+	render();
 }
 
 
@@ -248,14 +283,14 @@ function init(){
 
 	};
 	
-	eventProx( root , "click" , "h1" , select );
-	addBtn.onclick = function(){ 
-		addBranch( branchContent.value ); 
-		breadthOrder( root );
-		render();
-	};
-	deleteBtn.onclick = deleteBranch;
-	breadthOrder( root );
+	eventProx( root , "click" , "content" , select );
+
+	eventProx( root , "click" , "add" , addBranch );
+
+	eventProx( root , "click" , "remove" , deleteBranch );
+
+
+	bindNlist();
 	render();
 }
 

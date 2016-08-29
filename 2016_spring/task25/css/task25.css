@@ -13,8 +13,9 @@ label{
 	width: 5em;
 }
 
-.node{
 
+.node{
+	/*position: relative;*/
 	/*border: 1px solid;*/
 }
 
@@ -28,12 +29,18 @@ label{
 	padding-left: 2em;
 }
 
-.select{
-	background: #00f;
+.content{
+	display: inline-block;
+	min-width: 5em;
+	cursor: pointer;
 }
 
-.light{
-	background: #ccc;
+.select>h1 .content{
+	background: #ccf;
+}
+
+.light>h1 .content{
+	background: #663;
 }
 
 .closeBranch,.openBranch{
@@ -44,27 +51,28 @@ label{
 	display: none;
 }
 
-.row.closeBranch>h1::before,.row>h1::before{
+.row.closeBranch>h1 .content::before,.row>h1 .content::before{
 	content: "";
 	display: inline-block;
 	vertical-align: middle;
 	width: 0;
 	height: 0;
 
-	position: relative;
-	left: -1em;
-
+	position: absolute;
+	margin-left: -1em;
+	margin-top: .5em;
 	border-style: solid;
 	cursor: pointer;
 }
-.row>h1::before{
+.row>h1 .content::before{
 	border-width: .5em .2em 0 .2em;
-	border-color: #ff0 transparent transparent transparent;
+	border-color: #366 transparent transparent transparent;
 }
-.row.closeBranch>h1::before{
+.row.closeBranch>h1 .content::before{
 	border-width: .2em 0 .2em .4em;
-	border-color: transparent transparent transparent #0f0;
+	border-color: transparent transparent transparent #366;
 }
+
 
 
 
@@ -84,4 +92,7 @@ label{
 }
 .node>h1:hover>.add,.node>h1:hover>.remove{
 	display: inline-block;
+}
+.root>h1:hover>.remove{
+	display: none;
 }

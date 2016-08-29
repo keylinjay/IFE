@@ -28,6 +28,7 @@ textarea{
 	margin-left: .5em;
 	border-radius: 5px;
 	border: 1px solid;
+	cursor: pointer;
 }
 .show span:hover{
 
