@@ -27,6 +27,8 @@
 	position: absolute;
 	left: 50%;
 	top: 50%;
+
+	/*transform: rotateZ(10deg);*/
 }
 
 .ship>span{
@@ -42,7 +44,3 @@
 
 
 
-.planet:hover .point{
-	transform: rotateZ(360deg);
-	transition: transform 2s linear;
-}
