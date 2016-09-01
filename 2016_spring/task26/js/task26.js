@@ -51,10 +51,10 @@ function AirShip ( cost , recover , radius , speed  ) {
 	this.recover = recover;
 	this.commond = "stop";
 	this.radDistance = 0;
-	
+	this.running = false;
 	// 获取Id
 	this.id = AirShip._ids_[0];
-	console.log( this.id );
+	console.log( "id:" + this.id );
 	this.name = "AirShip" + this.id;
 	
 	this.radius = (radius && ( radius > 60 ) ) ? radius : ( 40+25*( +this.id ) );
@@ -78,69 +78,65 @@ function AirShip ( cost , recover , radius , speed  ) {
 
 AirShip.prototype = {
 	constructor : AirShip,
-	costEnerge : function(){
-		this.energe -= this.cost;
-
-		this.nText.innerText = this.energe + "%";
+	costEnerge : function( v ){
+		if ( this.energe > v ){
+			
+			this.energe -= v;
+		}else {
+			this.energe = 0;
+		}
+		
 	},
-	recoverEnerge : function(){
-		this.energe += this.recover;
+	recoverEnerge : function( v ){
+		if ( this.energe < ( 100 - v ) ){
 
-		this.nText.innerText = this.energe + "%";
+			this.energe += v;
+		}else {
+			this.energe = 100;
+		}
+
 	},
 	run : function(){
-		this.commond = "run";
+		
 		var self = this;
-		var start = ( new Date() ).getTime();
+
 		var fps = 20;
-		// 第n秒计算一次剩余能量
-		var n = 1;
-		animate();
-		function animate(){
-			var elapsed = ( new Date() ).getTime() - start;
-			// console.log( "elapsed:" + elapsed );
-			
 
+		console.log( self.commond );
+		// 如果run状态，直接返回
+		if ( self.running ){
+			console.log( "running" );
+			return false;
+		}
+
+		var animate = setInterval( function (){
+			self.running = true;
 			if( self.energe > 0 && self.commond === "run" ){
+				self.costEnerge( this.cost*1000/fps );
+				self.recoverEnerge( this.recover*1000/fps );
 				self.radDistance += self.radSpeed/( 1000/fps );
-				// 经过整数秒执行一次cosntEnerge()
-				if ( Math.floor( elapsed/1000 ) === n ){
-					self.costEnerge();
-					self.recoverEnerge();
-					n++;
-				}
-					// console.log( "energe:"+ self.energe );
-
-				self.node.style.transform = "rotateZ(" + self.radDistance + "deg)";
-				// console.log( self.speed );
+				// console.log( "radDistance:" + self.radDistance );
 				
+				// console.log( "energe:"+ self.energe );
+				self.node.style.transform = "rotateZ(" + self.radDistance + "deg)";
+				self.nText.innerText = self.energe + "%";
+			}
 
-				setTimeout( animate , 1000/fps );
-			}else {
-				self.commond = "stop";
-				if ( self.energe < 100 ){
-
-					if ( self.energe < 0 ){
-						self.energe = 0;
-					}
-
-					if ( self.energe > 100 ){
-						self.energe = 100;
-					}
-
-					self.recoverEnerge();
-					// console.log( self.energe );
-					setTimeout( animate , 1000 );
+			if ( self.commond === "stop" ){
+				self.recoverEnerge( this.recover*1000/fps );
+				if ( self.energe === 100 ){
+					self.running = false;
+					clearInterval( animate );
 				}
 			}
 			
-		}
+		} , 1000/fps );
 	},
 	stop : function(){
 		this.commond = "stop";
 
 	},
-	destroid : function() {
+	destroy : function() {
 		// 回收id
 		AirShip._ids_.unshift( this.id );
 
@@ -157,8 +153,8 @@ AirShip.prototype = {
 		if ( this.commond === "stop" ){
 			this.stop();
 		}
-		if ( this.commond === "destroid" ){
-			this.destroid();
+		if ( this.commond === "destroy" ){
+			this.destroy();
 		}
 	},
 	recive : function ( ) {
@@ -217,10 +213,10 @@ function send ( str ) {
 	if ( hasClass( this , "stop" ) ){
 		ocmd.commond = "stop";
 	}
-	if ( hasClass( this , "destroid" ) ){
-		ocmd.commond = "destroid";
+	if ( hasClass( this , "destroy" ) ){
+		ocmd.commond = "destroy";
 	}
-	console.log( ocmd );
+	// console.log( ocmd );
 	Mediator.send( ocmd );
 }
 
