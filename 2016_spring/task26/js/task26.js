@@ -102,7 +102,8 @@ AirShip.prototype = {
 
 		var fps = 20;
 
-		console.log( self.commond );
+		var cost =  self.cost*fps/1000;
+		var recover =  self.recover*fps/1000;
 		// 如果run状态，直接返回
 		if ( self.running ){
 			console.log( "running" );
@@ -112,22 +113,30 @@ AirShip.prototype = {
 		var animate = setInterval( function (){
 			self.running = true;
 			if( self.energe > 0 && self.commond === "run" ){
-				self.costEnerge( this.cost*1000/fps );
-				self.recoverEnerge( this.recover*1000/fps );
+				self.costEnerge( cost-recover );
 				self.radDistance += self.radSpeed/( 1000/fps );
 				// console.log( "radDistance:" + self.radDistance );
 				
 				// console.log( "energe:"+ self.energe );
 				self.node.style.transform = "rotateZ(" + self.radDistance + "deg)";
-				self.nText.innerText = self.energe + "%";
+				self.nText.innerText = Math.floor( self.energe ) + "%";
+				self.nText.style.width = Math.floor( self.energe )/100*50 + "px";
+			}else {
+				self.commond = "stop";
 			}
 
 			if ( self.commond === "stop" ){
-				self.recoverEnerge( this.recover*1000/fps );
+				self.recoverEnerge( recover );
+				self.nText.innerText = Math.floor( self.energe ) + "%";
+				self.nText.style.width = Math.floor( self.energe )/100*50 + "px";
 				if ( self.energe === 100 ){
 					self.running = false;
 					clearInterval( animate );
 				}
+			}
+
+			if( self.commond === "destroy" ){
+				clearInterval( animate );
 			}
 			
 		} , 1000/fps );
@@ -137,6 +146,7 @@ AirShip.prototype = {
 
 	},
 	destroy : function() {
+		this.commond = "destroy";
 		// 回收id
 		AirShip._ids_.unshift( this.id );
 
@@ -144,7 +154,7 @@ AirShip.prototype = {
 
 		this.node.parentElement.removeChild( this.node );
 
-		deleteObj( this );
+		
 	},
 	init : function () {
 		if ( this.commond === "run" ){
@@ -185,6 +195,7 @@ AirShip.add = function( parent , name , radius ,str ){
 // 定义Mediator
 var Mediator = {
 	failRate: 0.3,
+	spreadSpeed : 1000,
 	member : [],
 	msg : "",
 	add : function( o ){
@@ -193,39 +204,55 @@ var Mediator = {
 	remove : function( o ){
 		array_delete( this.member , o );
 	},
-	send : function( o ){
-		this.msg = JSON.stringify(o);
-		if ( Math.random() > this.failRate ? true : false )
-		for( var i = 0 ; i < this.member.length ; i++ ){
-			this.member[i].recive();
+	deal : function( id , commond ){
+		var ocmd = {
+			id : id,
+			commond : commond,
 		}
-	}
+		this.msg = JSON.stringify(ocmd);
+	},
+	send : function( id , commond ){
+		this.deal( id , commond );
+		console.log( "发送信息：" + this.msg );
+		var self = this;
+		setTimeout( function(){
+
+			if ( Math.random() > self.failRate ? true : false ){
+
+				for( var i = 0 ; i < self.member.length ; i++ ){
+					self.member[i].recive();
+				}
+			}else{
+				console.log( "发送失败。" )
+			}
+		}, this.spreadSpeed );
+	},
 };
 
-function send ( str ) {
-	var ocmd = {
-		id : str,
-		commond : "",
-	}
+
+
+function btnSend ( id ){
+	var commond;
 	if ( hasClass( this , "run" ) ){
-		ocmd.commond = "run";
+		commond = "run";
 	}
 	if ( hasClass( this , "stop" ) ){
-		ocmd.commond = "stop";
+		commond = "stop";
 	}
 	if ( hasClass( this , "destroy" ) ){
-		ocmd.commond = "destroy";
+		commond = "destroy";
 	}
-	// console.log( ocmd );
-	Mediator.send( ocmd );
+	Mediator.send( id , commond );
 }
 
-eventProx( _g( "#ship1" )[0] , "click" , "btn" , send , ["0001"] );
+eventProx( _g( "#ship1" )[0] , "click" , "btn" , btnSend , ["0001"] );
 
-eventProx( _g( "#ship2" )[0] , "click" , "btn" , send , ["0002"] );
+eventProx( _g( "#ship2" )[0] , "click" , "btn" , btnSend , ["0002"] );
 
-_g( "#creat-ship" )[0].onclick = function(){new AirShip( 11 , 1 );};
+_g( "#creat-ship" )[0].onclick = function(){new AirShip( 40 , 20 );};
 
+new AirShip( 40 , 20 );
+new AirShip( 40 , 20 );
 
 
 // Mediator.send( {id:"0001",commond:"run"} );
