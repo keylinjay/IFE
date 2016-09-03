@@ -45,6 +45,16 @@ function eventProx( node , type , className , fn , args ){
 		}
 	},false);
 }
+
+function log ( str ){
+	var counter = log.counter++;
+	var s = ( counter < 10 ? "0" + counter : counter ) + ":" + str;
+	var node = _g( ".log" )[0];
+	node.innerHTML = "<p>" + s + "</p>" + node.innerHTML;
+}
+log.counter = 1;
+
+
 // 构造函数
 function AirShip ( cost , recover , radius , speed  ) {
 	this.cost = cost;
@@ -74,6 +84,7 @@ function AirShip ( cost , recover , radius , speed  ) {
 
 	// 注册mediator
 	Mediator.add( this );
+	log( "成功创造了飞船，编号为：" + this.id );
 }
 
 AirShip.prototype = {
@@ -219,11 +230,13 @@ var Mediator = {
 
 			if ( Math.random() > self.failRate ? true : false ){
 
+				log( "发送成功。" );
 				for( var i = 0 ; i < self.member.length ; i++ ){
 					self.member[i].recive();
 				}
 			}else{
 				console.log( "发送失败。" )
+				log( "发送失败。" );
 			}
 		}, this.spreadSpeed );
 	},
@@ -244,6 +257,30 @@ function btnSend ( id ){
 	}
 	Mediator.send( id , commond );
 }
+
+function consleMove ( event , str ) {
+	
+}
+_g( ".bar" )[0].onmousedown = function (event){
+
+	var node = _g( ".console" )[0];
+	var width = node.offsetWidth;
+	var height = node.offsetHeight;
+	var dl = event.clientX - node.offsetLeft;
+	console.log(dl);
+	var dt = event.clientY - node.offsetTop;
+	document.onmousemove = function(e){
+		var left = event.clientX - dl;
+		var top = event.clientY - dt;
+		console.log(event.clientX);
+		node.style.left = left + "px";
+		node.style.top = top + "px";
+	}
+	_g( ".bar" )[0].onmouseup = function(e){
+		document.onmousemove = null;
+		this.onmouseup = null;
+	}
+};
 
 eventProx( _g( "#ship1" )[0] , "click" , "btn" , btnSend , ["0001"] );
 
