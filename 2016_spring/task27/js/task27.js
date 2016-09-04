@@ -77,13 +77,13 @@ function AirShip ( cost , recover , radius , speed  ) {
 	// 从id列表中删除发出去的id
 	AirShip.useId( this.id );
 	// 初始化dom
-	AirShip.add( _g( "#task26>.planet" )[0] , this.name , this.radius , this.energe );
+	AirShip.add( _g( "#task27>.planet" )[0] , this.name , this.radius , this.energe );
 	// 绑定dom对象
 	this.node = _g( "." + this.name )[0];
 	this.nText = _g( "." + this.name + ">span" )[0];
 
 	// 注册mediator
-	Mediator.add( this );
+	BUS.add( this );
 	log( "成功创造了飞船，编号为：" + this.id );
 }
 
@@ -161,7 +161,7 @@ AirShip.prototype = {
 		// 回收id
 		AirShip._ids_.unshift( this.id );
 
-		Mediator.remove( this );
+		BUS.remove( this );
 
 		this.node.parentElement.removeChild( this.node );
 
@@ -179,7 +179,7 @@ AirShip.prototype = {
 		}
 	},
 	recive : function ( ) {
-		var ocmd = JSON.parse( Mediator.msg );
+		var ocmd = JSON.parse( BUS.msg );
 		if ( ocmd.id === this.id ){
 			this.commond = ocmd.commond;
 			this.init();
@@ -242,7 +242,43 @@ var Mediator = {
 	},
 };
 
+// 定义BUS传输介质
+var BUS = {
+	failRate: 0.1,
+	spreadSpeed : 300,
+	member : [],
+	msg : "",
+	add : function( o ){
+		this.member.push( o );
+	},
+	remove : function( o ){
+		array_delete( this.member , o );
+	},
+	deal : function( id , commond ){
+		var ocmd = {
+			id : id,
+			commond : commond,
+		}
+		this.msg = JSON.stringify(ocmd);
+	},
+	send : function( id , commond ){
+		this.deal( id , commond );
+		console.log( "发送信息：" + this.msg );
+		var self = this;
+		var t = setInterval( function(){
 
+			if ( Math.random() > self.failRate ? true : false ){
+				clearInterval( t );
+				log( "发送成功。" );
+				for( var i = 0 ; i < self.member.length ; i++ ){
+					self.member[i].recive();
+				}
+			}else{
+				log( "发送失败，尝试重新发送。" );
+			}
+		}, this.spreadSpeed );
+	},
+};
 
 function btnSend ( id ){
 	var commond;
@@ -255,7 +291,8 @@ function btnSend ( id ){
 	if ( hasClass( this , "destroy" ) ){
 		commond = "destroy";
 	}
-	Mediator.send( id , commond );
+	BUS.send( id , commond );
+	// Mediator.send( id , commond );
 }
 
 function consleMove ( event , str ) {
