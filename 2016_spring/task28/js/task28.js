@@ -77,7 +77,7 @@ function AirShip ( cost , recover , radius , speed  ) {
 	// 从id列表中删除发出去的id
 	AirShip.useId( this.id );
 	// 初始化dom
-	AirShip.add( _g( "#task27>.planet" )[0] , this.name , this.radius , this.energe );
+	AirShip.add( _g( "#task28>.planet" )[0] , this.name , this.radius , this.energe );
 	// 绑定dom对象
 	this.node = _g( "." + this.name )[0];
 	this.nText = _g( "." + this.name + ">span" )[0];
@@ -187,19 +187,47 @@ AirShip.prototype = {
 		}
 	},
 	Adapter : function( msg ){
-		console.log( msg );
-		var id = msg.substring( 0 , 4 );
-		var commond = msg.substring( 4 );
-		if ( commond === "0001" ){
-			commond = "run";
+		if ( msg ){
+
+			var id = msg.substring( 0 , 4 );
+			var commond = msg.substring( 4 );
+			if ( commond === "0001" ){
+				commond = "run";
+			}
+			if( commond === "0010" ){
+				commond = "stop";
+			}
+			if ( commond === "1100" ){
+				commond = "destroy";
+			}
+			return {id:id,commond:commond};
 		}
-		if( commond === "0010" ){
-			commond = "stop";
+		if ( !msg ){
+			var state = this.id;
+			if ( this.commond === "run" ){
+				state += "0001";
+			}
+			if ( this.commond === "stop" ){
+				state += "0010";
+			}
+			if ( this.commond === "destroy"){
+				state += "1100";
+			}
+			if ( this.energe < 10 ){
+				state += "0000000" + this.energe;
+			}else if ( this.energe < 100 ){
+				state += "000000" + this.energe;
+			}else {
+				state += "00000" + this.energe;
+			}
+			return state;
 		}
-		if ( commond === "1100" ){
-			commond = "destroy";
-		}
-		return {id:id,commond:commond};
+	},
+	send : function () {
+		var state = this.Adapter();
+		var timer = setInterval ( function(){
+			
+		},1000);
 	},
 }
 
@@ -218,44 +246,6 @@ AirShip.add = function( parent , name , radius ,str ){
 	parent.appendChild( ship );
 }
 
-// 定义Mediator
-var Mediator = {
-	failRate: 0.3,
-	spreadSpeed : 1000,
-	member : [],
-	msg : "",
-	add : function( o ){
-		this.member.push( o );
-	},
-	remove : function( o ){
-		array_delete( this.member , o );
-	},
-	deal : function( id , commond ){
-		var ocmd = {
-			id : id,
-			commond : commond,
-		}
-		this.msg = JSON.stringify(ocmd);
-	},
-	send : function( id , commond ){
-		this.deal( id , commond );
-		console.log( "发送信息：" + this.msg );
-		var self = this;
-		setTimeout( function(){
-
-			if ( Math.random() > self.failRate ? true : false ){
-
-				log( "发送成功。" );
-				for( var i = 0 ; i < self.member.length ; i++ ){
-					self.member[i].recive();
-				}
-			}else{
-				console.log( "发送失败。" )
-				log( "发送失败。" );
-			}
-		}, this.spreadSpeed );
-	},
-};
 
 // 定义BUS传输介质
 var BUS = {
