@@ -44,8 +44,9 @@
 }
 
 
-.control {
-	position: absolute;
+.select,.control {
+	/*position: absolute;*/
+
 	color: #ff6;
 	border: 1px solid;
 

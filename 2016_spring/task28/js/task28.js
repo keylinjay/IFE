@@ -41,11 +41,12 @@ function eventProx( node , type , className , fn , args ){
 		var event = arguments[0] || window.event;
 		var target = event.target;
 		if ( hasClass( target , className ) ){
-			fn.apply( target , args );
+			fn.call( target , args );
 		}
 	},false);
 }
 
+// log函数用来在页面输出日志
 function log ( str ){
 	var counter = log.counter++;
 	var s = "<span>" + ( counter < 10 ? "0" + counter : counter ) + ":</span>" + str;
@@ -54,9 +55,43 @@ function log ( str ){
 }
 log.counter = 1;
 
+// 对信息进行编码解码的函数
+function encodeInfo ( ocmd ){
+	var id = ocmd.id;
+	var commond = ocmd.commond;
+	var energe = ocmd.energe || "";
+	if ( commond === "run" ){
+		commond = "0001";
+	}
+	if ( commond === "stop" ){
+		commond = "0010";
+	}
+	if ( commond === "destroy"){
+		commond = "1100";
+	}
+	return id + commond + energe;
+}
+
+function decodeInfo ( msg ){
+	var id = msg.substring( 0 , 4 );
+	var commond = msg.substring( 4 , 8 );
+	var energe = msg.substring( 8 );
+	if ( commond === "0001" ){
+		commond = "run";
+	}
+	if( commond === "0010" ){
+		commond = "stop";
+	}
+	if ( commond === "1100" ){
+		commond = "destroy";
+	}
+	return {id:id,commond:commond,energe:energe};
+}
+
+
 
 // 构造函数
-function AirShip ( cost , recover , radius , speed  ) {
+function AirShip ( cost , recover , speed , radius  ) {
 	this.cost = cost;
 	this.recover = recover;
 	this.commond = "stop";
@@ -85,6 +120,7 @@ function AirShip ( cost , recover , radius , speed  ) {
 	// 注册mediator
 	BUS.add( this );
 	log( "成功创造了飞船，编号为：" + this.id );
+	this.send();
 }
 
 AirShip.prototype = {
@@ -186,47 +222,20 @@ AirShip.prototype = {
 			this.init();
 		}
 	},
-	Adapter : function( msg ){
-		if ( msg ){
-
-			var id = msg.substring( 0 , 4 );
-			var commond = msg.substring( 4 );
-			if ( commond === "0001" ){
-				commond = "run";
-			}
-			if( commond === "0010" ){
-				commond = "stop";
-			}
-			if ( commond === "1100" ){
-				commond = "destroy";
-			}
-			return {id:id,commond:commond};
-		}
-		if ( !msg ){
-			var state = this.id;
-			if ( this.commond === "run" ){
-				state += "0001";
-			}
-			if ( this.commond === "stop" ){
-				state += "0010";
-			}
-			if ( this.commond === "destroy"){
-				state += "1100";
-			}
-			if ( this.energe < 10 ){
-				state += "0000000" + this.energe;
-			}else if ( this.energe < 100 ){
-				state += "000000" + this.energe;
-			}else {
-				state += "00000" + this.energe;
-			}
-			return state;
+	Adapter : function( cmd ){
+		if ( typeof cmd === "string" ){
+			return decodeInfo( cmd );
+		}else {
+			return encodeInfo ( cmd );
 		}
 	},
 	send : function () {
-		var state = this.Adapter();
+		var state;
+		var self = this;
 		var timer = setInterval ( function(){
-			
+			state = self.Adapter( {id:self.id , commond:self.commond , energe:Math.floor(self.energe)});
+			console.log( state );
+			BUS.recive( state );
 		},1000);
 	},
 }
@@ -283,22 +292,80 @@ var BUS = {
 			}
 		}, this.spreadSpeed );
 	},
-	Adapter : function( id , commond ){
-		var msg;
-		msg = id;
-		if ( commond === "run" ){
-			msg += "0001";
-		}
-		if ( commond === "stop" ){
-			msg += "0010";
-		}
-		if ( commond === "destroy"){
-			msg += "1100";
-		}
-		this.msg = msg;
+	Adapter : function( cmd ){
+		this.msg = encodeInfo( cmd );
+	},
+	recive : function ( state ){
+		DC.recive( state );
 	},
 };
+// 定义数据处理中心，接受BUS传来的数据并转为对象储存起来
+var DC = {
+	state : {},
+	Adapter : function( state ){
+		return decodeInfo( state );
+	},
+	recive : function ( state ){
+		var o = this.Adapter( state );
+		this.state[ o.id ] = o;
+		// console.log( this.state );
+	},
+}
+// 定义行星对象，用来生成相应的HTML
+var Planet = {
+	ships : [],
+	selectShip : {
+		cost : 5,
+		recover : 4,
+		speed : 30,
+	},
+	setShip : function(){
+		var cost;
+		var speed;
+		var recover;
+		var nodecost =  _g( "input[name='cost']" );
+		var noderecover = _g( "input[name='recover']" );
+		var i;
+		for( i = 0 ; i < nodecost.length ; i++ ){
+			if ( nodecost[i].checked ){
+				var value = nodecost[i].value;
+				var p = value.indexOf( "," );
+				speed = +value.substring( 0 , p );
+				cost = +value.substring( p+1 );
+			}
+		}
+		for( i = 0 ; i < noderecover.length ; i++ ){
+			if (noderecover[i].checked ){
+				recover = +noderecover[i].value;
+			}
+		}
+		this.selectShip.cost = cost;
+		this.selectShip.recover = recover;
+		this.selectShip.speed = speed;
+	},
+	creatShip : function(){
 
+		this.setShip();
+		var ship =  new AirShip( this.selectShip.cost , this.selectShip.recover , this.selectShip.speed );
+		this.ships.push( ship );
+	},
+	control : function(){
+		var html = "";
+		var btnHtml = "<button class='run btn'>run</button> <button class='stop btn'>stop</button> <button class='destroy btn'>destroy</button>";
+		for ( var p in DC.state ){
+			html += "<div class='Ship'" + p +">对" + p + "号飞船下达命令：" + btnHtml + "<span>剩余能源" + DC.state[p].energe + "%</span></div>"
+			eventProx( _g(".control")[0] , "click" , "btn" , btnSend , p );
+			log( DC.state[p].energe );
+		}
+		_g( ".control" )[0].innerHTML = html;
+	},
+	init : function(){
+		eventProx( _g("#creat-ship")[0] , "click" , "btn" , function(){Planet.creatShip();} );
+		var timer = setInterval( this.control , 1000 );
+	},
+}
+
+// 按钮点击发送信息的事件函数
 function btnSend ( id ){
 	var commond;
 	if ( hasClass( this , "run" ) ){
@@ -310,13 +377,11 @@ function btnSend ( id ){
 	if ( hasClass( this , "destroy" ) ){
 		commond = "destroy";
 	}
-	BUS.send( id , commond );
+	BUS.send( {id:id,commond:commond} );
 	// Mediator.send( id , commond );
 }
 
-function consleMove ( event , str ) {
-	
-}
+// console面板的拖动事件绑定
 _g( ".bar" )[0].onmousedown = function (event){
 
 	var node = _g( ".console" )[0];
@@ -341,14 +406,13 @@ _g( ".bar" )[0].onmousedown = function (event){
 	}
 };
 
-eventProx( _g( "#ship1" )[0] , "click" , "btn" , btnSend , ["0001"] );
+eventProx( _g( "#ship1" )[0] , "click" , "btn" , btnSend , "0001" );
 
-eventProx( _g( "#ship2" )[0] , "click" , "btn" , btnSend , ["0002"] );
+eventProx( _g( "#ship2" )[0] , "click" , "btn" , btnSend , "0002" );
 
-_g( "#creat-ship" )[0].onclick = function(){new AirShip( 40 , 20 );};
+// _g( "#creat-ship" )[0].onclick = function(){new AirShip( 40 , 20 );};
 
-new AirShip( 40 , 20 );
-new AirShip( 40 , 20 );
+Planet.init();
 
 
 // Mediator.send( {id:"0001",commond:"run"} );
