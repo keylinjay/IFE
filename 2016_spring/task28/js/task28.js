@@ -120,6 +120,11 @@ function AirShip ( cost , recover , speed , radius  ) {
 	// 注册mediator
 	BUS.add( this );
 	log( "成功创造了飞船，编号为：" + this.id );
+
+	// 开始动画
+	this.animate = this.startAnimate();
+	// 发送自身的状态
+	
 	this.send();
 }
 
@@ -143,8 +148,7 @@ AirShip.prototype = {
 		}
 
 	},
-	run : function(){
-		
+	startAnimate : function(){
 		var self = this;
 
 		var fps = 20;
@@ -152,12 +156,12 @@ AirShip.prototype = {
 		var cost =  self.cost*fps/1000;
 		var recover =  self.recover*fps/1000;
 		// 如果run状态，直接返回
-		if ( self.running ){
-			console.log( "running" );
-			return false;
-		}
+		// if ( self.running ){
+			// console.log( "running" );
+		// 	return false;
+		// }
 
-		var animate = setInterval( function (){
+		var timer = setInterval( function (){
 			self.running = true;
 			if( self.energe > 0 && self.commond === "run" ){
 				self.costEnerge( cost-recover );
@@ -168,7 +172,9 @@ AirShip.prototype = {
 				self.node.style.transform = "rotateZ(" + self.radDistance + "deg)";
 				self.nText.innerText = Math.floor( self.energe ) + "%";
 				self.nText.style.width = Math.floor( self.energe )/100*50 + "px";
-			}else {
+			}
+
+			if ( self.energe === 0 ){
 				self.commond = "stop";
 			}
 
@@ -176,17 +182,30 @@ AirShip.prototype = {
 				self.recoverEnerge( recover );
 				self.nText.innerText = Math.floor( self.energe ) + "%";
 				self.nText.style.width = Math.floor( self.energe )/100*50 + "px";
-				if ( self.energe === 100 ){
-					self.running = false;
-					clearInterval( animate );
-				}
+				// if ( self.energe === 100 ){
+				// 	self.running = false;
+				// 	clearInterval( timer );
+				// }
 			}
-
+			// console.log( "I'm still running!!" );
+			// log( self.commond );
 			if( self.commond === "destroy" ){
-				clearInterval( animate );
+				// 回收id
+				console.log("destroy");
+				// AirShip._ids_.unshift( self.id );
+
+				// BUS.remove( self );
+
+				// self.node.parentElement.removeChild( self.node );
+				clearInterval( timer );
 			}
 			
 		} , 1000/fps );
+		return timer;
+	},
+	run : function(){
+		this.commond = "run";
+		
 	},
 	stop : function(){
 		this.commond = "stop";
@@ -194,6 +213,8 @@ AirShip.prototype = {
 	},
 	destroy : function() {
 		this.commond = "destroy";
+		console.log( this.commond );
+		// clearInterval( this.animate );
 		// 回收id
 		AirShip._ids_.unshift( this.id );
 
@@ -201,6 +222,7 @@ AirShip.prototype = {
 
 		this.node.parentElement.removeChild( this.node );
 
+		_g( ".ship" + this.id )[0].parentElement.removeChild( _g( ".ship" + this.id )[0] );
 		
 	},
 	init : function () {
@@ -211,6 +233,7 @@ AirShip.prototype = {
 			this.stop();
 		}
 		if ( this.commond === "destroy" ){
+			// console.log( " start destroy" );
 			this.destroy();
 		}
 	},
@@ -219,6 +242,7 @@ AirShip.prototype = {
 		console.log( ocmd );
 		if ( ocmd.id === this.id ){
 			this.commond = ocmd.commond;
+			console.log( this.commond );
 			this.init();
 		}
 	},
@@ -234,8 +258,11 @@ AirShip.prototype = {
 		var self = this;
 		var timer = setInterval ( function(){
 			state = self.Adapter( {id:self.id , commond:self.commond , energe:Math.floor(self.energe)});
-			console.log( state );
+			// console.log( state );
 			BUS.recive( state );
+			if ( self.commond === "destroy" ){
+				clearInterval( timer );
+			}
 		},1000);
 	},
 }
@@ -275,8 +302,8 @@ var BUS = {
 		}
 		this.msg = JSON.stringify(ocmd);
 	},
-	send : function( id , commond ){
-		this.Adapter( id , commond );
+	send : function( ocmd ){
+		this.Adapter( ocmd );
 		console.log( "发送信息：" + this.msg );
 		var self = this;
 		var t = setInterval( function(){
@@ -308,12 +335,12 @@ var DC = {
 	recive : function ( state ){
 		var o = this.Adapter( state );
 		this.state[ o.id ] = o;
-		// console.log( this.state );
+		console.log( this.state );
 	},
 }
 // 定义行星对象，用来生成相应的HTML
 var Planet = {
-	ships : [],
+	ships : {},
 	selectShip : {
 		cost : 5,
 		recover : 4,
@@ -323,6 +350,8 @@ var Planet = {
 		var cost;
 		var speed;
 		var recover;
+		var powerSys;
+		var energeSys;
 		var nodecost =  _g( "input[name='cost']" );
 		var noderecover = _g( "input[name='recover']" );
 		var i;
@@ -332,54 +361,107 @@ var Planet = {
 				var p = value.indexOf( "," );
 				speed = +value.substring( 0 , p );
 				cost = +value.substring( p+1 );
+				if ( value === "30,5" ){
+					powerSys = "前进号";
+				}else if ( value === "50,7" ){
+					powerSys = "奔腾号";
+				}else if ( value === "80,9" ){
+					powerSys = "超越号";
+				}
 			}
 		}
 		for( i = 0 ; i < noderecover.length ; i++ ){
 			if (noderecover[i].checked ){
+
 				recover = +noderecover[i].value;
+				if ( recover === 2 ){
+					energeSys = "劲量型";
+				}else if ( recover === 3 ){
+					energeSys = "光能型";
+				}else if ( recover === 4 ){
+					energeSys = "永久型";
+				}
+
 			}
 		}
 		this.selectShip.cost = cost;
 		this.selectShip.recover = recover;
 		this.selectShip.speed = speed;
+		this.selectShip.powerSys = powerSys;
+		this.selectShip.energeSys = energeSys;
 	},
 	creatShip : function(){
-
+		var ship;
+		var node;
+		
 		this.setShip();
-		var ship =  new AirShip( this.selectShip.cost , this.selectShip.recover , this.selectShip.speed );
-		this.ships.push( ship );
-	},
-	control : function(){
-		var html = "";
-		var btnHtml = "<button class='run btn'>run</button> <button class='stop btn'>stop</button> <button class='destroy btn'>destroy</button>";
-		for ( var p in DC.state ){
-			html += "<div class='Ship'" + p +">对" + p + "号飞船下达命令：" + btnHtml + "<span>剩余能源" + DC.state[p].energe + "%</span></div>"
-			eventProx( _g(".control")[0] , "click" , "btn" , btnSend , p );
-			log( DC.state[p].energe );
+		ship =  new AirShip( this.selectShip.cost , this.selectShip.recover , this.selectShip.speed );
+		if ( ship.id > 4 ){
+			ship.destroy();
+			return false;
 		}
-		_g( ".control" )[0].innerHTML = html;
+		this.ships[ship.id]={
+			powerSys:this.selectShip.powerSys,
+			energeSys:this.selectShip.energeSys,
+		};
+		// console.log( this.ships );
+
+		node = document.createElement( "div" );
+		node.className = "ship" + ship.id;
+		node.innerHTML = "<span>对" + ship.id + "号飞船下达命令:</span><button class='run btn'>起飞吧</button> <button class='stop btn'>停下来</button> <button class='destroy btn'>拉出去续了</button>";
+		eventProx( node , "click" , "btn" , btnSend , ship.id );
+		_g( ".control" )[0].appendChild( node );
+		function btnSend ( id ){
+			var commond;
+			if ( hasClass( this , "run" ) ){
+				commond = "run";
+			}
+			if ( hasClass( this , "stop" ) ){
+				commond = "stop";
+			}
+			if ( hasClass( this , "destroy" ) ){
+				commond = "destroy";
+				// _g( ".control" )[0].removeChild( this.parentElement );
+			}
+			BUS.send( {id:id,commond:commond} );
+			// Mediator.send( id , commond );
+		}
+	},
+	showState : function(){
+		var node = _g( ".shipsState>table" )[0];
+		var html = "<thead><tr><td>飞船</td><td>动力系统</td><td>能源系统</td><td>当前飞行状态</td><td>剩余能耗</td></tr></thead><tbody>";
+		var energe;
+		var commond;
+		var state;
+		var powerSys;
+		var energeSys;
+		for ( var p in DC.state ){
+			energe = DC.state[p].energe;
+			commond = DC.state[p].commond;
+			// console.log( this );
+			powerSys = Planet.ships[p].powerSys;
+			energeSys = Planet.ships[p].energeSys;
+			if ( commond === "run" 	){
+				state = "飞行中";
+			}else if ( commond === "stop" ){
+				state = "停止飞行";
+			}else {
+				state = "已经自爆";
+			}
+			html += "<tr><td>" + p + "号<td>" + powerSys + "</td><td>" + energeSys + "</td><td>" + state + "</td><td>" + energe + "%</td></tr>";
+		}
+		html += "</tbody>";
+		node.innerHTML = html;
+		
 	},
 	init : function(){
 		eventProx( _g("#creat-ship")[0] , "click" , "btn" , function(){Planet.creatShip();} );
-		var timer = setInterval( this.control , 1000 );
+		var timer = setInterval( Planet.showState , 1000 );
 	},
 }
 
 // 按钮点击发送信息的事件函数
-function btnSend ( id ){
-	var commond;
-	if ( hasClass( this , "run" ) ){
-		commond = "run";
-	}
-	if ( hasClass( this , "stop" ) ){
-		commond = "stop";
-	}
-	if ( hasClass( this , "destroy" ) ){
-		commond = "destroy";
-	}
-	BUS.send( {id:id,commond:commond} );
-	// Mediator.send( id , commond );
-}
+
 
 // console面板的拖动事件绑定
 _g( ".bar" )[0].onmousedown = function (event){
@@ -406,9 +488,9 @@ _g( ".bar" )[0].onmousedown = function (event){
 	}
 };
 
-eventProx( _g( "#ship1" )[0] , "click" , "btn" , btnSend , "0001" );
+// eventProx( _g( "#ship1" )[0] , "click" , "btn" , btnSend , "0001" );
 
-eventProx( _g( "#ship2" )[0] , "click" , "btn" , btnSend , "0002" );
+// eventProx( _g( "#ship2" )[0] , "click" , "btn" , btnSend , "0002" );
 
 // _g( "#creat-ship" )[0].onclick = function(){new AirShip( 40 , 20 );};
 

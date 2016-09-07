@@ -44,12 +44,27 @@
 }
 
 
-.select,.control {
+.select,.control,.shipsState {
 	/*position: absolute;*/
 
 	color: #ff6;
 	border: 1px solid;
 
+}
+.control,.shipsState{
+	width: 25em;
+	height: 200px;
+	float: left;
+}
+.control span{
+	display: inline-block;
+	width: 11em;
+}
+.shipsState table,.shipsState table td{
+	border: 1px solid #9f9;
+}
+.shipsState table thead{
+	background: #663;
 }
 .console{
 	position: absolute;
