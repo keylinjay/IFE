@@ -14,7 +14,10 @@ function deleteObj ( obj ) {
 	delete obj;
 }
 
-function _g ( str ) {
+function _g ( str , contax ) {
+	if ( contax ){
+		return contax.querySelectorAll( str );
+	}
 	return document.querySelectorAll( str );
 }
 
@@ -51,7 +54,7 @@ function eventProx( node , type , className , fn , args ){
 		}
 		if ( hasClass( target , className ) ){
 			console.log( newArgs );
-			fn.apply( target , newArgs );
+			fn.apply( event , newArgs );
 		}
 	},false);
 }
@@ -200,10 +203,10 @@ function AirShip ( cost , recover , speed , radius  ) {
 	// 从id列表中删除发出去的id
 	AirShip.useId( this.id );
 	// 初始化dom
-	AirShip.add( _g( "#task28>.planet" )[0] , this.name , this.radius , this.energe );
+	
 	// 绑定dom对象
-	this.node = _g( "." + this.name )[0];
-	this.nText = _g( "." + this.name + ">span" )[0];
+	this.node = AirShip.add( _g( "#task28>.planet" )[0] , this.name , this.radius , this.energe );;
+	this.nText = _g( "span" , this.node )[0];
 
 	// 注册mediator
 	BUS.add( this );
@@ -214,6 +217,19 @@ function AirShip ( cost , recover , speed , radius  ) {
 	// 发送自身的状态
 	
 	this.send();
+
+	// 监听planet的命令
+	BUS2.listen('planet', doCommond );
+
+	var self = this;
+	function doCommond (data){
+		console.log('listen succuss');
+		// console.log(self.id);
+		if ( self.id === data.id ){
+			self.commond = data.commond;
+			self.init();
+		}
+	}
 }
 
 AirShip.prototype = {
@@ -304,13 +320,18 @@ AirShip.prototype = {
 		console.log( this.commond );
 		// clearInterval( this.animate );
 		// 回收id
-		AirShip._ids_.unshift( this.id );
-
-		BUS.remove( this );
+		console.log( AirShip._ids_ );
+		console.log( this.name );
+		console.log( this.node );
+		console.log( this.node.parentElement );
 
 		this.node.parentElement.removeChild( this.node );
 
 		_g( ".ship" + this.id )[0].parentElement.removeChild( _g( ".ship" + this.id )[0] );
+
+		AirShip._ids_.unshift( this.id );
+
+		// this =null;
 		
 	},
 	init : function () {
@@ -347,7 +368,8 @@ AirShip.prototype = {
 		var timer = setInterval ( function(){
 			state = self.Adapter( {id:self.id , commond:self.commond , energe:Math.floor(self.energe)});
 			// console.log( state );
-			BUS.recive( state );
+			// BUS.recive( state );
+			BUS2.send( 'state',state );
 			if ( self.commond === "destroy" ){
 				clearInterval( timer );
 			}
@@ -368,6 +390,8 @@ AirShip.add = function( parent , name , radius ,str ){
 	ship.className = " point ship " + name;
 	ship.innerHTML = "<span style =top:-" + radius +"px>" + str + "%</span>";
 	parent.appendChild( ship );
+	console.log( parent );
+	return ship;
 }
 
 
@@ -427,7 +451,7 @@ var BUS2 = (function(){
 		clientList[key].push( fn );
 		console.log( clientList );
 	};
-	var trigger = function (){
+	var send = function (){
 		var args = [].slice.apply( arguments );
 		var key = [].shift.apply( args );
 		var fns = clientList[key];
@@ -439,22 +463,28 @@ var BUS2 = (function(){
 	};
 	return {
 		listen:listen,
-		trigger:trigger
+		send:send
 	};
 })();
 
 // 定义数据处理中心，接受BUS传来的数据并转为对象储存起来
-var DC = {
-	state : {},
-	Adapter : function( state ){
-		return decodeInfo( state );
-	},
-	recive : function ( state ){
-		var o = this.Adapter( state );
-		this.state[ o.id ] = o;
-		console.log( this.state );
-	},
-}
+var DC = (function(){
+	var state = {};
+	var Adapter = function(data){
+		return decodeInfo( data );
+	};
+	BUS2.listen('state', function(data){
+		var o = Adapter( data );
+		state[ o.id ] = o;
+		if ( o.commond === 'destroy' ){
+			console.log( 'destroied' );
+			state[ o.id ] = null;
+		}
+		// console.log( state );
+	});
+	return {state:state};
+})(); 
+
 // 定义行星对象，用来生成相应的HTML
 var Planet = {
 	ships : {},
@@ -513,10 +543,6 @@ var Planet = {
 		
 		this.setShip();
 		ship =  new AirShip( this.selectShip.cost , this.selectShip.recover , this.selectShip.speed );
-		if ( ship.id > 4 ){
-			ship.destroy();
-			return false;
-		}
 		this.ships[ship.id]={
 			powerSys:this.selectShip.powerSys,
 			energeSys:this.selectShip.energeSys,
@@ -528,19 +554,25 @@ var Planet = {
 		node.innerHTML = "<span>对" + ship.id + "号飞船下达命令:</span><button class='run btn'>起飞吧</button> <button class='stop btn'>停下来</button> <button class='destroy btn'>拉出去续了</button>";
 		eventProx( node , "click" , "btn" , btnSend , [ship.id] );
 		_g( ".control" )[0].appendChild( node );
+		if ( ship.id > 4 ){
+			ship.destroy();
+			return false;
+		}
 		function btnSend ( e , id ){
 			var commond;
-			if ( hasClass( this , "run" ) ){
+			if ( hasClass( e.target , "run" ) ){
 				commond = "run";
 			}
-			if ( hasClass( this , "stop" ) ){
+			if ( hasClass( e.target , "stop" ) ){
 				commond = "stop";
 			}
-			if ( hasClass( this , "destroy" ) ){
+			if ( hasClass( e.target , "destroy" ) ){
 				commond = "destroy";
 				// _g( ".control" )[0].removeChild( this.parentElement );
 			}
-			BUS.send( {id:id,commond:commond} );
+			// BUS.send( {id:id,commond:commond} );
+			console.log('btnsend succuss');
+			BUS2.send( 'planet' , {id:id,commond:commond} );
 			// Mediator.send( id , commond );
 		}
 	},
@@ -553,21 +585,24 @@ var Planet = {
 		var powerSys;
 		var energeSys;
 		for ( var p in DC.state ){
-			energe = DC.state[p].energe;
-			commond = DC.state[p].commond;
-			// console.log( this );
-			powerSys = Planet.ships[p].powerSys;
-			energeSys = Planet.ships[p].energeSys;
-			if ( commond === "run" 	){
-				state = "飞行中";
-			}else if ( commond === "stop" ){
-				state = "停止飞行";
-			}else {
-				state = "已经自爆";
+			if ( DC.state[p] ){
+				energe = DC.state[p].energe;
+				commond = DC.state[p].commond;
+				// console.log( this );
+				powerSys = Planet.ships[p].powerSys;
+				energeSys = Planet.ships[p].energeSys;
+				if ( commond === "run" 	){
+					state = "飞行中";
+				}else if ( commond === "stop" ){
+					state = "停止飞行";
+				}else {
+					state = "已经自爆";
+				}
+				html += "<tr><td>" + p + "号<td>" + powerSys + "</td><td>" + energeSys + "</td><td>" + state + "</td><td>" + energe + "%</td></tr>";
 			}
-			html += "<tr><td>" + p + "号<td>" + powerSys + "</td><td>" + energeSys + "</td><td>" + state + "</td><td>" + energe + "%</td></tr>";
 		}
 		html += "</tbody>";
+		// console.log( html );
 		node.innerHTML = html;
 		
 	},
