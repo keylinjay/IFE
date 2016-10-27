@@ -414,6 +414,35 @@ var BUS = {
 		DC.recive( state );
 	},
 };
+
+// 定义升级的BUS2
+var BUS2 = (function(){
+	var failRate = 0.1,
+		spreadSpeed = 300,
+		clientList = {};
+	var listen = function ( key , fn ){
+		if ( !clientList[key] ){
+			clientList[key] = [];
+		}
+		clientList[key].push( fn );
+		console.log( clientList );
+	};
+	var trigger = function (){
+		var args = [].slice.apply( arguments );
+		var key = [].shift.apply( args );
+		var fns = clientList[key];
+		if ( fns ){
+			for ( var i = 0,len = fns.length; i < len ; i++ ){
+				fns[i].apply( null , args );
+			}
+		}
+	};
+	return {
+		listen:listen,
+		trigger:trigger
+	};
+})();
+
 // 定义数据处理中心，接受BUS传来的数据并转为对象储存起来
 var DC = {
 	state : {},
