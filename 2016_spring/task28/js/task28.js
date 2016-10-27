@@ -35,25 +35,35 @@ function removeClass( node ,str ){
 		node.className = node.className.replace( reg , "" );
 	}
 }
+/*
+	事件代理函数
+	传入的参数 node：事件代理对象，type：事件类型，className：执行事件的类名，fn：处理函数，args：处理函数的参数(数组形式)
 
+*/
 function eventProx( node , type , className , fn , args ){
 	node.addEventListener( type , function(){
 		var event = arguments[0] || window.event;
 		var target = event.target;
+		var newArgs = [ event ];
+		if ( args ){
+			// 将event作为第一个参数
+			newArgs = newArgs.concat( args );
+		}
 		if ( hasClass( target , className ) ){
-			fn.call( target , args );
+			console.log( newArgs );
+			fn.apply( target , newArgs );
 		}
 	},false);
 }
 
 // log函数用来在页面输出日志
-function log ( str ){
-	var counter = log.counter++;
+var log = function ( str ){
+	var counter = log._counter++;
 	var s = "<span>" + ( counter < 10 ? "0" + counter : counter ) + ":</span>" + str;
 	var node = _g( ".log" )[0];
 	node.innerHTML = "<p>" + s + "</p>" + node.innerHTML;
 }
-log.counter = 1;
+log._counter = 1;
 
 // 对信息进行编码解码的函数
 function encodeInfo ( ocmd ){
@@ -88,9 +98,87 @@ function decodeInfo ( msg ){
 	return {id:id,commond:commond,energe:energe};
 }
 
+// 拖拽函数
+var drag = function ( event , elementToDrag ){
+	var scroll = {x:document.documentElement.scrollLeft,y:document.documentElement.scrollTop};
+	// 初始鼠标坐标位置，转换鼠标坐标为文档坐标
+	var startX = event.clientX + scroll.x;
+	var startY = event.clientY + scroll.y;
+	// 待拖动元素的初始位置
+	var origX = elementToDrag.offsetLeft;
+	var origY = elementToDrag.offsetTop;
+	var width = elementToDrag.clientWidth;
+	var height = elementToDrag.clientHeight;
+	// 鼠标距离待拖动元素左上角的距离
+	var deltaX = startX - origX;
+	var deltaY = startY - origY;
+	// 注册mousedown事件时的 mousemove和mouseup事件
+	if ( document.addEventListener ){
+		document.addEventListener( 'mousemove' , moveHandler , true );
+		document.addEventListener( 'mouseup' , upHandler , true );
+	}else if ( document.attachEvent ){
+		// 处理ie浏览器
+	}
+	// 不让其他元素看到他
+	if ( event.stopPropagation ){
+		event.stopPropagation();
+	}else {
+		// 处理ie浏览器
+	}
+	// 阻止事件的默认操作
+	if ( event.preventDefault ){
+		event.preventDefault();
+	}else {
+		// 处理ie浏览器
+	}
+	// mousemove事件处理函数
+	function moveHandler ( e ){
+		if (!e) e = window.event;//IE模型
+		var scroll = {x:document.documentElement.scrollLeft,y:document.documentElement.scrollTop};
+		// 拖动后的元素位置,
+		var dragX = e.clientX + scroll.x - deltaX;
+		var dragY = e.clientY + scroll.y - deltaY;
 
+		if ( dragX < 0 ){
+			dragX = 0;
+		}else if ( dragX > (window.innerWidth - width) ){
+			dragX = window.innerWidth - width;
+		}
+		if ( dragY < 0 ){
+			dragY = 0;
+		}else if ( dragY > (window.innerHeight - height) ){
+			dragY = window.innerHeight - height;
+		}
+		elementToDrag.style.left = dragX + "px";
+		elementToDrag.style.top = dragY + "px";
+		// 不让其他元素看到他,阻止事件传播
+		if ( event.stopPropagation ){
+			event.stopPropagation();
+		}else {
+			// 处理ie浏览器
+		}
+	}
+	// mouseup事件
+	function upHandler ( e ){
+		if (!e) e = window.event;//IE模型
+		// 注销事件
+		if ( document.removeEventListener ){
+			document.removeEventListener( 'mousemove' , moveHandler , true );
+			document.removeEventListener( 'mouseup' , upHandler , true );
+		}else if ( document.attachEvent ){
+			// 处理ie浏览器
 
-// 构造函数
+		}
+		// 不让其他元素看到他,阻止事件传播
+		if ( event.stopPropagation ){
+			event.stopPropagation();
+		}else {
+			// 处理ie浏览器
+		}
+	}
+}
+
+// 飞船构造函数
 function AirShip ( cost , recover , speed , radius  ) {
 	this.cost = cost;
 	this.recover = recover;
@@ -409,9 +497,9 @@ var Planet = {
 		node = document.createElement( "div" );
 		node.className = "ship" + ship.id;
 		node.innerHTML = "<span>对" + ship.id + "号飞船下达命令:</span><button class='run btn'>起飞吧</button> <button class='stop btn'>停下来</button> <button class='destroy btn'>拉出去续了</button>";
-		eventProx( node , "click" , "btn" , btnSend , ship.id );
+		eventProx( node , "click" , "btn" , btnSend , [ship.id] );
 		_g( ".control" )[0].appendChild( node );
-		function btnSend ( id ){
+		function btnSend ( e , id ){
 			var commond;
 			if ( hasClass( this , "run" ) ){
 				commond = "run";
@@ -455,7 +543,7 @@ var Planet = {
 		
 	},
 	init : function(){
-		eventProx( _g("#creat-ship")[0] , "click" , "btn" , function(){Planet.creatShip();} );
+		eventProx( _g("#creat-ship")[0] , "click" , "btn" , function(e){Planet.creatShip();} );
 		var timer = setInterval( Planet.showState , 1000 );
 	},
 }
@@ -464,29 +552,62 @@ var Planet = {
 
 
 // console面板的拖动事件绑定
-_g( ".bar" )[0].onmousedown = function (event){
+_g('.bar')[0].onmousedown = function(e){
+	drag( e , _g('.console')[0] );
+}
+// _g( ".bar" )[0].onmousedown = function (event){
+// 	var self = this;
+// 	var node = _g( ".console" )[0];
+// 	var width = node.clientWidth;
+// 	var height = node.clientHeight;
+// 	var dl = event.clientX - node.offsetLeft;
+// 	console.log(dl);
+// 	var dt = event.clientY - node.offsetTop;
+// 	document.onmousemove = function(e){
+// 		var left = e.clientX - dl;
+// 		var top = e.clientY - dt;
 
-	var node = _g( ".console" )[0];
-	var width = node.clientWidth;
-	var height = node.clientHeight;
-	var dl = event.clientX - node.offsetLeft;
-	console.log(dl);
-	var dt = event.clientY - node.offsetTop;
-	document.onmousemove = function(e){
-		var left = e.clientX - dl;
-		var top = e.clientY - dt;
+// 		left = left < 0 ? 0 : left > (window.innerWidth - width) ? (window.innerWidth - width) : left;
+// 		top = top < 0 ? 0 : top > (window.innerHeight - height) ? (window.innerHeight - height) : top;
+// 		console.log(event.clientX);
+// 		node.style.left = left + "px";
+// 		node.style.top = top + "px";
+// 	}
+// 	_g( ".bar" )[0].onmouseup = function(e){
+// 		document.onmousemove = null;
+// 		this.onmouseup = null;
+// 	}
+// };
+// _g( ".bar" )[0].onmousedown = function (event){
+// 	var self = this;
+// 	var node = _g( ".console" )[0];
+// 	var width = node.clientWidth;
+// 	var height = node.clientHeight;
+// 	var dl = event.clientX - node.offsetLeft;
+// 	// console.log(dl);
+// 	var dt = event.clientY - node.offsetTop;
+// 	document.addEventListener( 'mousemove' , moveHandler , true );
+// 	document.addEventListener( 'mouseup' , upHandler , true );
+// 	event.stopPropagation();
+// 	event.preventDefault();
 
-		left = left < 0 ? 0 : left > (window.innerWidth - width) ? (window.innerWidth - width) : left;
-		top = top < 0 ? 0 : top > (window.innerHeight - height) ? (window.innerHeight - height) : top;
-		console.log(event.clientX);
-		node.style.left = left + "px";
-		node.style.top = top + "px";
-	}
-	_g( ".bar" )[0].onmouseup = function(e){
-		document.onmousemove = null;
-		// this.onmouseup = null;
-	}
-};
+// 	function moveHandler(e){
+// 		var left = e.clientX - dl;
+// 		var top = e.clientY - dt;
+
+// 		left = left < 0 ? 0 : left > (window.innerWidth - width) ? (window.innerWidth - width) : left;
+// 		top = top < 0 ? 0 : top > (window.innerHeight - height) ? (window.innerHeight - height) : top;
+// 		console.log(event.clientX);
+// 		node.style.left = left + "px";
+// 		node.style.top = top + "px";
+// 		e.stopPropagation();
+// 	}
+// 	function upHandler(e){
+// 		document.removeEventListener( 'mousemove' , moveHandler ,true );
+// 		document.removeEventListener( 'mouseup' , upHandler , true );
+// 		e.stopPropagation();
+// 	}
+// };
 
 // eventProx( _g( "#ship1" )[0] , "click" , "btn" , btnSend , "0001" );
 
