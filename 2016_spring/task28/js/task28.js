@@ -60,7 +60,13 @@ function eventProx( node , type , className , fn , args ){
 }
 
 // log函数用来在页面输出日志
-var log = function ( str ){
+var log = function ( data ){
+	// console.log( data );
+	var str = data;
+	if ( typeof data === "object" ){
+		str = JSON.stringify( data );
+		console.log(str);
+	}
 	var counter = log._counter++;
 	var s = "<span>" + ( counter < 10 ? "0" + counter : counter ) + ":</span>" + str;
 	var node = _g( ".log" )[0];
@@ -154,6 +160,8 @@ var drag = function ( event , elementToDrag ){
 		}
 		elementToDrag.style.left = dragX + "px";
 		elementToDrag.style.top = dragY + "px";
+		elementToDrag.style.right = 'auto';
+		elementToDrag.style.bottom = 'auto';
 		// 不让其他元素看到他,阻止事件传播
 		if ( event.stopPropagation ){
 			event.stopPropagation();
@@ -183,6 +191,10 @@ var drag = function ( event , elementToDrag ){
 
 // 飞船构造函数
 function AirShip ( cost , recover , speed , radius  ) {
+	if ( !AirShip._ids_[0] ){
+		log( '飞船数量已达上限' );
+		return;
+	}
 	this.cost = cost;
 	this.recover = recover;
 	this.commond = "stop";
@@ -205,11 +217,11 @@ function AirShip ( cost , recover , speed , radius  ) {
 	// 初始化dom
 	
 	// 绑定dom对象
-	this.node = AirShip.add( _g( "#task28>.planet" )[0] , this.name , this.radius , this.energe );;
+	this.node = AirShip.add( _g( "#task28>.planet" )[0] , this.name , this.radius , this.energe );
 	this.nText = _g( "span" , this.node )[0];
 
 	// 注册mediator
-	BUS.add( this );
+	
 	log( "成功创造了飞船，编号为：" + this.id );
 
 	// 开始动画
@@ -295,12 +307,13 @@ AirShip.prototype = {
 			// log( self.commond );
 			if( self.commond === "destroy" ){
 				// 回收id
-				console.log("destroy");
-				// AirShip._ids_.unshift( self.id );
+				console.log("anim-destroy");
+				AirShip._ids_.unshift( self.id );
 
 				// BUS.remove( self );
-
-				// self.node.parentElement.removeChild( self.node );
+				console.log( self.node );
+				self.node.parentElement.removeChild( self.node );
+				_g( ".ship" + self.id )[0].parentElement.removeChild( _g( ".ship" + self.id )[0] );
 				clearInterval( timer );
 			}
 			
@@ -317,21 +330,6 @@ AirShip.prototype = {
 	},
 	destroy : function() {
 		this.commond = "destroy";
-		console.log( this.commond );
-		// clearInterval( this.animate );
-		// 回收id
-		console.log( AirShip._ids_ );
-		console.log( this.name );
-		console.log( this.node );
-		console.log( this.node.parentElement );
-
-		this.node.parentElement.removeChild( this.node );
-
-		_g( ".ship" + this.id )[0].parentElement.removeChild( _g( ".ship" + this.id )[0] );
-
-		AirShip._ids_.unshift( this.id );
-
-		// this =null;
 		
 	},
 	init : function () {
@@ -346,15 +344,7 @@ AirShip.prototype = {
 			this.destroy();
 		}
 	},
-	recive : function (	msg ) {
-		var ocmd = this.Adapter( msg );
-		console.log( ocmd );
-		if ( ocmd.id === this.id ){
-			this.commond = ocmd.commond;
-			console.log( this.commond );
-			this.init();
-		}
-	},
+	
 	Adapter : function( cmd ){
 		if ( typeof cmd === "string" ){
 			return decodeInfo( cmd );
@@ -373,12 +363,12 @@ AirShip.prototype = {
 			if ( self.commond === "destroy" ){
 				clearInterval( timer );
 			}
-		},1000);
+		},500);
 	},
 }
 
 
-AirShip._ids_ = [ "0001" , "0002" , "0003" , "0004" , "0005" , "0006" ];
+AirShip._ids_ = [ "0001" , "0002" , "0003" , "0004" ];
 
 AirShip.useId = function( id ){
 	this._ids_ = array_delete( this._ids_ , id );
@@ -396,48 +386,48 @@ AirShip.add = function( parent , name , radius ,str ){
 
 
 // 定义BUS传输介质
-var BUS = {
-	failRate: 0.1,
-	spreadSpeed : 300,
-	member : [],
-	msg : "",
-	add : function( o ){
-		this.member.push( o );
-	},
-	remove : function( o ){
-		array_delete( this.member , o );
-	},
-	deal : function( id , commond ){
-		var ocmd = {
-			id : id,
-			commond : commond,
-		}
-		this.msg = JSON.stringify(ocmd);
-	},
-	send : function( ocmd ){
-		this.Adapter( ocmd );
-		console.log( "发送信息：" + this.msg );
-		var self = this;
-		var t = setInterval( function(){
+// var BUS = {
+// 	failRate: 0.1,
+// 	spreadSpeed : 300,
+// 	member : [],
+// 	msg : "",
+// 	add : function( o ){
+// 		this.member.push( o );
+// 	},
+// 	remove : function( o ){
+// 		array_delete( this.member , o );
+// 	},
+// 	deal : function( id , commond ){
+// 		var ocmd = {
+// 			id : id,
+// 			commond : commond,
+// 		}
+// 		this.msg = JSON.stringify(ocmd);
+// 	},
+// 	send : function( ocmd ){
+// 		this.Adapter( ocmd );
+// 		console.log( "发送信息：" + this.msg );
+// 		var self = this;
+// 		var t = setInterval( function(){
 
-			if ( Math.random() > self.failRate ? true : false ){
-				clearInterval( t );
-				log( "发送成功。" );
-				for( var i = 0 ; i < self.member.length ; i++ ){
-					self.member[i].recive( self.msg );
-				}
-			}else{
-				log( "发送失败，尝试重新发送。" );
-			}
-		}, this.spreadSpeed );
-	},
-	Adapter : function( cmd ){
-		this.msg = encodeInfo( cmd );
-	},
-	recive : function ( state ){
-		DC.recive( state );
-	},
-};
+// 			if ( Math.random() > self.failRate ? true : false ){
+// 				clearInterval( t );
+// 				log( "发送成功。" );
+// 				for( var i = 0 ; i < self.member.length ; i++ ){
+// 					self.member[i].recive( self.msg );
+// 				}
+// 			}else{
+// 				log( "发送失败，尝试重新发送。" );
+// 			}
+// 		}, this.spreadSpeed );
+// 	},
+// 	Adapter : function( cmd ){
+// 		this.msg = encodeInfo( cmd );
+// 	},
+// 	recive : function ( state ){
+// 		DC.recive( state );
+// 	},
+// };
 
 // 定义升级的BUS2
 var BUS2 = (function(){
@@ -455,6 +445,8 @@ var BUS2 = (function(){
 		var args = [].slice.apply( arguments );
 		var key = [].shift.apply( args );
 		var fns = clientList[key];
+		log( '发送消息：' );
+		log( args[0] );
 		if ( fns ){
 			for ( var i = 0,len = fns.length; i < len ; i++ ){
 				fns[i].apply( null , args );
@@ -543,6 +535,10 @@ var Planet = {
 		
 		this.setShip();
 		ship =  new AirShip( this.selectShip.cost , this.selectShip.recover , this.selectShip.speed );
+		if ( !ship.id ){
+			console.log('没有新的飞船');
+			return;
+		}
 		this.ships[ship.id]={
 			powerSys:this.selectShip.powerSys,
 			energeSys:this.selectShip.energeSys,
@@ -554,10 +550,7 @@ var Planet = {
 		node.innerHTML = "<span>对" + ship.id + "号飞船下达命令:</span><button class='run btn'>起飞吧</button> <button class='stop btn'>停下来</button> <button class='destroy btn'>拉出去续了</button>";
 		eventProx( node , "click" , "btn" , btnSend , [ship.id] );
 		_g( ".control" )[0].appendChild( node );
-		if ( ship.id > 4 ){
-			ship.destroy();
-			return false;
-		}
+		
 		function btnSend ( e , id ){
 			var commond;
 			if ( hasClass( e.target , "run" ) ){
@@ -608,7 +601,7 @@ var Planet = {
 	},
 	init : function(){
 		eventProx( _g("#creat-ship")[0] , "click" , "btn" , function(e){Planet.creatShip();} );
-		var timer = setInterval( Planet.showState , 1000 );
+		var timer = setInterval( Planet.showState , 500 );
 	},
 }
 
