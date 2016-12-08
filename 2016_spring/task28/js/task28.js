@@ -363,7 +363,7 @@ AirShip.prototype = {
 			if ( self.commond === "destroy" ){
 				clearInterval( timer );
 			}
-		},500);
+		},1000);
 	},
 }
 
