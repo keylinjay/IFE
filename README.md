@@ -46,5 +46,5 @@
 
 [/2016_spring/task28](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2016_spring/task28/index.html)
 
-[/2016_spring/task29/task29.html](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2016_spring/task29/task29.html)
+[/2016_spring/task29](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2016_spring/task29/index.html)
 
