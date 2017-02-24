@@ -1,0 +1,3 @@
+var fselect = function (s) {
+    return document.querySelectorAll(s);}
+	       
