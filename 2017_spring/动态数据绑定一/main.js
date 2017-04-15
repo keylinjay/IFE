@@ -29,6 +29,7 @@ function convertf (obj) {
 	}
 	return obj;
 }
+
 var Observer = function (obj){
 	this.data = convertf(obj);
 }
@@ -41,4 +42,5 @@ var data = {
 		city: 'beijing'
 	}
 };
+
 var app1 = new Observer(data);
