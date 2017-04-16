@@ -48,3 +48,15 @@
 
 [/2016_spring/task29](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2016_spring/task29/index.html)
 
+[/2017_spring/RegExp-practice](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2017_spring/RegExp-practice/index.html)
+
+[/2017_spring/动态数据绑定一](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2017_spring/动态数据绑定一/index.html)
+
+[/2017_spring/动态数据绑定三](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2017_spring/动态数据绑定三/index.html)
+
+[/2017_spring/动态数据绑定二](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2017_spring/动态数据绑定二/index.html)
+
+[/2017_spring/动态数据绑定五](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2017_spring/动态数据绑定五/index.html)
+
+[/2017_spring/动态数据绑定四](https://keylinjay.github.io/IFE-baidu-front-end-lessons-practice/2017_spring/动态数据绑定四/index.html)
+

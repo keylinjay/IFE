@@ -4,7 +4,10 @@ var Vue = function (obj){
 	this.data = obj.data;
 	this.el = obj.el;
 	this.listener = [];
-	this.html = [];
+	this.nodes = document.querySelectorAll(obj.el);
+	this.htmls = [].map.call(this.nodes, function(node){
+		return node.innerHTML;
+	});
 	
 	this.convertf(obj.data);
 }
@@ -65,7 +68,8 @@ proto.convertf = function (obj){
 proto.$watch = function (key, fn){
 	var listener = this.listener,
 		index = this.listener.indexOf(key);
-	var key = 'top.' + key;
+
+	var key = 'top'? key : 'top.' + key;
 	if (index === -1){
 		listener.push(key);
 		listener[key] = [fn];
@@ -113,12 +117,12 @@ proto.$trigger = function (listener, key, args, fn){
 	}
 
 }
-proto.getNode = function (){
-	return document.querySelectorAll(this.el);
-}
+
 
 proto.renderDom = function (){
-	var data = this.data;
+	var data = this.data,
+		htmls = this.htmls,
+		nodes = this.nodes;
 	function lookup(key, obj){
 		var arkey = key.split('.');
 		return iter(arkey, obj);
@@ -148,13 +152,14 @@ proto.renderDom = function (){
 		}
 	}
 
-	function renderDom (node){
-		node.innerHTML = replaceVal(node.innerHTML);
+	function renderDom (node, html){
+		node.innerHTML = replaceVal(html);
 	}
 
-	this.getNode().forEach(function(node){
-		renderDom(node);
-	});
+	var len = nodes.length;
+	for(var i = 0; i < len; i++){
+		renderDom(nodes[i], htmls[i]);
+	}
 	console.log('in renderDom');
 }
 
@@ -169,7 +174,7 @@ var app = new Vue({
 	}
 });
 
-app.$watch('user', function(){
+app.$watch('top', function(){
 	app.renderDom();
 });
 app.renderDom();

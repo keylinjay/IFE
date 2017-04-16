@@ -17,5 +17,12 @@ ls .\2016_spring -r |?{$_.name -like '*.html'}| foreach-object{$path=$_.versioni
     echo "[$linkname]($link)">>test;
     echo "">> test;
 }
+ls .\2017_spring -r |?{$_.name -like '*.html'}| foreach-object{$path=$_.versioninfo.filename.replace("\","/");
+    $link=$path.replace($lppath,$rppath);
+    $linkname=$link.replace("/index.html","");
+    $linkname=$linkname.replace($rppath,"");
+    echo "[$linkname]($link)">>test;
+    echo "">> test;
+}
 get-content test | out-file README.MD -encoding utf8
 rm test
