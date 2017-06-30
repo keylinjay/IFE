@@ -113,7 +113,13 @@ proto.$trigger = function (listener, key, args, fn){
 
 }
 proto.getNode = function (){
-	return document.querySelectorAll(this.el);
+	var res = [],
+		nodes = document.querySelectorAll(this.el);
+	for (var i = 0, len = nodes.length; i < len; i++){
+		res.push(nodes[i]);
+	}
+
+	return res;
 }
 proto.renderDom = function (){
 	var data = this.data;

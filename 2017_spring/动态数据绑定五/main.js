@@ -75,7 +75,7 @@ function parseDom(el, obj, emiter){
 			parseData(el);
 		}
 		if(el.childNodes.length !== 0){
-			el.childNodes.forEach(function(node){
+			[].forEach.call(el.childNodes, function(node){
 				parse(node);
 			});
 		}
