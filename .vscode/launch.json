@@ -1,34 +1,20 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
         {
-            "type": "PowerShell",
+            "type": "node",
             "request": "launch",
-            "name": "PowerShell Launch ",
-            "script": "${workspaceRoot}/",
-            "args": [],
-            "cwd": "${workspaceRoot}"
+            "name": "Launch Program",
+            "program": "${file}"
         },
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Launch Chrome",
-            "url": "http://localhost:8080",
-            "webRoot": "${workspaceRoot}"
-        },
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080",
-            "webRoot": "${workspaceRoot}"
-        },
-        {
-            "type": "chrome",
-            "request": "attach",
-            "name": "Attach to Chrome",
-            "port": 9222,
-            "webRoot": "${workspaceRoot}"
-        }
+       {
+           "type": "chrome",
+           "request": "launch",
+           "name": "启动chrome浏览器调试",
+           "url": "${file}",
+           "sourceMaps": true,
+           "webRoot": "${workspaceRoot}"
+       }
     ]
 }
