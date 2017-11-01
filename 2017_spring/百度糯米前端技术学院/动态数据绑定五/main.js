@@ -69,7 +69,9 @@ function parseDom(el, obj, emiter){
 	parse(el);
 	function parse (el){
 		if(el.nodeType === 1){
-			parseEvent(el);
+			if(el.dataset.type === 'event'){
+				parseEvent(el);	
+			}
 		}
 		if(el.nodeType === 3){
 			parseData(el);
