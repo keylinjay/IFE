@@ -132,8 +132,58 @@
     <aside class="siteAside">
         <h1 class="asiteHeader">侧栏注册窗口标题</h1>
         <form action="" class="asideForm">
+            <div class="form-group">
+                <label for="inputEmail" class="control-label">请输入邮箱地址： </label>
+                <input type="text" id="inputEmail" class="form-control" placeholder="这是一个文本输入框">
+            </div>
+            <p class="form-tip">邮箱地址请按要求格式输入</p>
+            <div class="form-group">
+                <label for="inputPassword" class="control-label">请输入密码：</label>
+                <input type="text" id="inputPassword" class="form-control" placeholder="这是一个文本输入框">
+
             
+            
+                <label for="inputPasswordAgain" class="control-label">请重复输入密码：</label>
+                <input type="text" id="inputPasswordAgain" class="form-control" placeholder="这是一个文本输入框">
+
+            </div>
+            <p class="form-tip">密码请为6-16位英文数字</p>
+            <div class="form-group">
+                <span>性别：</span>
+                <label>
+                    <input type="radio" name="selectSex" id="">
+                    男
+                </label>
+                <label>
+                    <input type="radio" name="selectSex" id="">
+                    女
+                </label>
+                <span>城市：</span>
+                <select name="selectCity" id="" class="form-control">
+                    <option value="shanghai">上海</option>
+
+                </select>
+                <span>爱好：</span>
+                <label for="">
+                    <input type="checkbox" name="" id="">
+                    运动
+                </label>
+                <label for="">
+                    <input type="checkbox" name="" id="">
+                    艺术
+                </label>
+                <label for="">
+                    <input type="checkbox" name="" id="">
+                    科学
+                </label>
+                <span>个人描述：</span>
+                <textarea name="" id="" cols="30" rows="2">这是一个多行输入框，输入你的个人描述</textarea>
+                <button type="submit">确认提交</button>
+            </div>
         </form>
     </aside>
+    <footer>
+        版权所有&copy
+    </footer>
 </body>
 </html>
